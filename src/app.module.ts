@@ -2,10 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
       ConfigModule.forRoot(),
+      MongooseModule.forRoot(process.env.MONGODB_URI || process.env.MONGODB_URI),  
+      HttpModule,
   ],
   controllers: [AppController],
   providers: [
