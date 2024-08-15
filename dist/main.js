@@ -6,7 +6,7 @@ const common_1 = require("@nestjs/common");
 async function bootstrap() {
     const logger = new common_1.Logger('Bootstrap');
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || process.env.SERVER_PORT;
     await app.listen(port);
     logger.log(`Application is running on port ${port}`);
 }

@@ -7,8 +7,8 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || process.env.SERVER_PORT;
   await app.listen(port);
-  logger.log(`Application is running on port ${port}`);
+  logger.log(`Lidapay application is listening on port ${port}!`);
 }
 bootstrap();

@@ -7,8 +7,9 @@ export class AppService {
     private readonly appName: string,
   ) {
   }
+  
   getHello(): string {
     // console.log(process.env);
-    return `いらっしゃいませ from ${this.appName}`;
+    return `いらっしゃいませ to ${this.appName}`;
   }
 }
