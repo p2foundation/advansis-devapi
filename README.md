@@ -57,6 +57,10 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+# push an existing repository from the command line
+git remote add origin https://github.com/p2foundation/advansis-devapi.git
+git branch -M main
+git push -u origin main
 
 ## Support
 
