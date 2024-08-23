@@ -12,14 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailService = void 0;
 const common_1 = require("@nestjs/common");
 const nodemailer = require("nodemailer");
+const constants_1 = require("../constants");
 let EmailService = class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             service: 'gmail',
             secure: false,
             auth: {
-                user: process.env.EMAIL_ADDRESS,
-                pass: process.env.EMAIL_PASSWORD
+                user: process.env.EMAIL_ADDRESS || constants_1.EMAIL_ADDRESS,
+                pass: process.env.EMAIL_PASSWORD || constants_1.EMAIL_PASSWORD
             },
             tls: {
                 rejectUnauthorized: false

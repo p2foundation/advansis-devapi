@@ -1,6 +1,7 @@
 import { sign, verify } from 'jsonwebtoken';
+import { JWT_SECRET } from 'src/constants';
 
-const secretKey = process.env.JWT_SECRET || process.env.JWT_SECRET;
+const secretKey = process.env.JWT_SECRET || JWT_SECRET;
 
 export class TokenUtil {
 
@@ -27,4 +28,5 @@ export class TokenUtil {
       throw new Error(`Invalid token: ${error.message}`);
     }
   }
+  
 }

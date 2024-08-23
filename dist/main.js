@@ -5,6 +5,7 @@ const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const helmet_1 = require("helmet");
 const swagger_1 = require("@nestjs/swagger");
+const constants_1 = require("./constants");
 async function bootstrap() {
     const logger = new common_1.Logger(bootstrap.name);
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
@@ -21,10 +22,11 @@ async function bootstrap() {
         .setDescription(description)
         .setVersion('1.0')
         .addTag('lidapay')
+        .addBearerAuth()
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api-doc', app, document);
-    const port = process.env.PORT || process.env.SERVER_PORT;
+    const port = process.env.PORT || constants_1.SERVER_PORT;
     try {
         await app.listen(port);
         logger.debug(`Lidapay app is running on: ${await app.getUrl()}`);

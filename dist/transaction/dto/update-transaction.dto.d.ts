@@ -1,0 +1,31 @@
+export declare class UpdateTransactionDto {
+    readonly userId: string;
+    readonly merchantId?: string;
+    readonly merchantName?: string;
+    transType?: string;
+    serviceType?: String;
+    customerName?: String;
+    customerEmail?: String;
+    customerPhone?: String;
+    serviceTransId?: String;
+    transMessage?: String;
+    paymentMethod: String;
+    paymentStatus?: String;
+    currentBalance?: String;
+    balanceBefore?: String;
+    balanceAfter?: String;
+    reward?: String;
+    commentary?: String;
+    amount?: number;
+    currency?: string;
+    localTransId?: String;
+    amountPaid: String;
+    charge: String;
+    recipientNumber: String;
+    senderNumber: String;
+    transDescription: String;
+    transStatus: string;
+    referrerClientId?: string;
+    transactionId: string;
+    networkOperator: string;
+}

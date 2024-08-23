@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenUtil = void 0;
 const jsonwebtoken_1 = require("jsonwebtoken");
-const secretKey = process.env.JWT_SECRET || process.env.JWT_SECRET;
+const constants_1 = require("../constants");
+const secretKey = process.env.JWT_SECRET || constants_1.JWT_SECRET;
 class TokenUtil {
     static generateToken(payload, expiresIn = '1h') {
         console.debug(`TokenUtil, generateToken() payload ==> ${JSON.stringify(payload)}`);

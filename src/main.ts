@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet'; // Add this import
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SERVER_PORT } from './constants';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
@@ -23,11 +24,12 @@ async function bootstrap() {
     .setDescription(description)
     .setVersion('1.0')
     .addTag('lidapay')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-doc', app, document);
 
-  const port = process.env.PORT || process.env.SERVER_PORT;
+  const port = process.env.PORT || SERVER_PORT;
   
   try {
     await app.listen(port);

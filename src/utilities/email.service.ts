@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { EMAIL_ADDRESS, EMAIL_PASSWORD } from 'src/constants';
 
 @Injectable()
 export class EmailService {
@@ -10,8 +11,8 @@ export class EmailService {
       service: 'gmail',
       secure: false, // or 'STARTTLS'
       auth: {
-        user: process.env.EMAIL_ADDRESS,
-        pass: process.env.EMAIL_PASSWORD
+        user: process.env.EMAIL_ADDRESS || EMAIL_ADDRESS,
+        pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD
       },
       tls: {
         rejectUnauthorized: false

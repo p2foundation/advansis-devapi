@@ -11,10 +11,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SmsService = void 0;
 const common_1 = require("@nestjs/common");
+const constants_1 = require("../constants");
 const twilio_1 = require("twilio");
 let SmsService = class SmsService {
     constructor() {
-        this.client = new twilio_1.Twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_TOKEN);
+        this.ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || constants_1.TWILIO_ACCOUNT_SID;
+        this.AUTH_TOKEN = process.env.TWILIO_TOKEN || constants_1.TWILIO_TOKEN;
+        this.client = new twilio_1.Twilio(this.ACCOUNT_SID, this.AUTH_TOKEN);
     }
     async sendSms(to, body) {
         return this.client.messages.create({
