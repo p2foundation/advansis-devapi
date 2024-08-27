@@ -15,6 +15,4 @@ export declare class MerchantService {
         total: number;
     }>;
     updateRewardPoints(clientId: string, points: number): Promise<void>;
-    generateQrCode(merchantId: string): Promise<string>;
-    viewRewards(merchantId: string): Promise<any>;
 }

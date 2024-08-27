@@ -15,6 +15,7 @@ var SmsController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SmsController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const sms_dto_1 = require("./dto/sms.dto");
 const sms_service_1 = require("./sms.service");
 let SmsController = SmsController_1 = class SmsController {
@@ -34,6 +35,19 @@ let SmsController = SmsController_1 = class SmsController {
 exports.SmsController = SmsController;
 __decorate([
     (0, common_1.Post)('sendsms'),
+    (0, swagger_1.ApiOperation)({ summary: 'Send SMS' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                recipient: { type: 'number' },
+                message: { type: 'string' },
+                senderId: { type: 'string' },
+                clientReference: { type: 'string' }
+            },
+            required: ['recipient', 'message', 'senderId']
+        }
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [sms_dto_1.SmsDto]),
@@ -41,13 +55,27 @@ __decorate([
 ], SmsController.prototype, "sendSms", null);
 __decorate([
     (0, common_1.Post)('bulk'),
+    (0, swagger_1.ApiOperation)({ summary: 'Send Bulk SMS' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                recipient: { type: 'number' },
+                message: { type: 'string' },
+                senderId: { type: 'string' },
+                clientReference: { type: 'string' }
+            },
+            required: ['recipient', 'message', 'senderId']
+        }
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [sms_dto_1.SmsDto]),
     __metadata("design:returntype", Promise)
 ], SmsController.prototype, "sendBulkSms", null);
 exports.SmsController = SmsController = SmsController_1 = __decorate([
-    (0, common_1.Controller)('api/sms'),
+    (0, swagger_1.ApiTags)('SMS'),
+    (0, common_1.Controller)('api/v1/sms'),
     __metadata("design:paramtypes", [sms_service_1.SmsService])
 ], SmsController);
 //# sourceMappingURL=sms.controller.js.map

@@ -15,6 +15,7 @@ var PscardpaymentController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PscardpaymentController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const callback_dto_1 = require("./dto/callback.dto");
 const inline_pay_dto_1 = require("./dto/inline.pay.dto");
 const pscardpayment_service_1 = require("./pscardpayment.service");
@@ -24,19 +25,21 @@ let PscardpaymentController = PscardpaymentController_1 = class PscardpaymentCon
         this.logger = new common_1.Logger(PscardpaymentController_1.name);
     }
     async primaryCallback(res, qr) {
-        const pc = await qr;
+        const pc = qr;
         this.logger.log(`TRANSACTION RESPONSE URL => ${JSON.stringify(pc)}`);
         res.status(common_1.HttpStatus.OK).json(pc);
     }
     async inlineCardMobilePayments(transDto) {
         this.logger.debug(`PAYMENT PAYLOAD => ${transDto}`);
-        const icmp = await this.pscardpaymentService.inlinePayments(transDto);
+        const icmp = this.pscardpaymentService.inlinePayments(transDto);
         return icmp;
     }
 };
 exports.PscardpaymentController = PscardpaymentController;
 __decorate([
     (0, common_1.Get)('redirecturl'),
+    (0, swagger_1.ApiOperation)({ summary: 'Primary Callback' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Transaction response', type: callback_dto_1.CallbackDto }),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -45,12 +48,15 @@ __decorate([
 ], PscardpaymentController.prototype, "primaryCallback", null);
 __decorate([
     (0, common_1.Post)('inline'),
+    (0, swagger_1.ApiOperation)({ summary: 'Inline Card Mobile Payments' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Payment response' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [inline_pay_dto_1.InlinePayDto]),
     __metadata("design:returntype", Promise)
 ], PscardpaymentController.prototype, "inlineCardMobilePayments", null);
 exports.PscardpaymentController = PscardpaymentController = PscardpaymentController_1 = __decorate([
+    (0, swagger_1.ApiTags)('cardpayment'),
     (0, common_1.Controller)('api/pscardpayment'),
     __metadata("design:paramtypes", [pscardpayment_service_1.PscardpaymentService])
 ], PscardpaymentController);

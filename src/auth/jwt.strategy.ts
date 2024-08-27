@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JWT_SECRET } from 'src/constants';
+import { JWT_SECRET } from '../constants';
 
 
 interface JwtPayload {
@@ -26,5 +26,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     this.logger.debug(`Validate payload ==> ${payload}`);
     return { sub: payload.sub, username: payload.username, roles: payload.roles };
   }
-  
 }

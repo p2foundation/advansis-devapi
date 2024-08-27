@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Merchant, MerchantDocument } from './schemas/merchant.schema';
 import { CreateMerchantDto } from './dto/create-merchant.dto';
@@ -33,7 +32,17 @@ export class MerchantService {
       password: hashedPassword,
       clientId,
       clientKey,
-      qrCode
+      qrCode,
+      address: [
+        { 
+          ghanaPostGPS: createMerchantDto.ghanaPostGPS, 
+          street: createMerchantDto.street,
+          city: createMerchantDto.city,
+          state: createMerchantDto.state,
+          zip: createMerchantDto.zip,
+          country: createMerchantDto.country,
+        }
+      ]
     };
 
     const createdMerchant = new this.merchantModel(merchantData);
@@ -73,20 +82,4 @@ export class MerchantService {
     ).exec();
   }
   // Other merchant management methods...
-  async generateQrCode(merchantId: string): Promise<string> {
-    const merchant = await this.merchantModel.findById(merchantId).exec();
-    if (!merchant) {
-      throw new Error('Merchant not found');
-    }
-    return merchant.qrCode;
-  }
-
-  async viewRewards(merchantId: string): Promise<any> {
-    const merchant = await this.merchantModel.findById(merchantId).exec();
-    if (!merchant) {
-      throw new Error('Merchant not found');
-    }
-    return { rewardPoints: merchant.rewardPoints };
-  }
-
 }

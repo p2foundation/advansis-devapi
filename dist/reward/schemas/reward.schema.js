@@ -23,14 +23,6 @@ __decorate([
     __metadata("design:type", Number)
 ], Reward.prototype, "points", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: false }),
-    __metadata("design:type", String)
-], Reward.prototype, "rewardType", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: false }),
-    __metadata("design:type", Date)
-], Reward.prototype, "expirationDate", void 0);
-__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], Reward.prototype, "history", void 0);

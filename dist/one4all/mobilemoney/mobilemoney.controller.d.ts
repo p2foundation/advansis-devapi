@@ -1,5 +1,5 @@
-import { ReceiveMoneyDto } from './dto/receive.money.dto';
 import { SendMoneyDto } from './dto/send.money.dto';
+import { ReceiveMoneyDto } from './dto/receive.money.dto';
 import { MobilemoneyService } from './mobilemoney.service';
 export declare class MobilemoneyController {
     private mobilemoneyService;

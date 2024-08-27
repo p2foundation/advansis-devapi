@@ -1,13 +1,12 @@
 export class CreateMerchantDto {
-    readonly name: string;
-    readonly email: string;
-    readonly phone: string;
-    readonly password: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    zipCode?: string;
-    GPSAddress?: string;
-  }
-  
+  readonly name: string;
+  readonly email: string;
+  readonly phoneNumber: string;
+  readonly password: string;
+  street?: string;
+  city?: string;
+  ghanaPostGPS?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+}

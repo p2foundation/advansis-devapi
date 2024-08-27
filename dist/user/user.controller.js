@@ -20,6 +20,7 @@ const user_service_1 = require("./user.service");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const auth_service_1 = require("../auth/auth.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const jwt_refresh_guard_1 = require("../auth/jwt-refresh.guard");
 const swagger_1 = require("@nestjs/swagger");
 let UserController = UserController_1 = class UserController {
     constructor(userService, authService) {
@@ -33,6 +34,9 @@ let UserController = UserController_1 = class UserController {
     }
     async login(req) {
         return this.authService.login(req.user);
+    }
+    async refreshToken(req) {
+        return this.authService.refreshToken(req.user);
     }
     async genRefreshToken(authHeader) {
         if (!authHeader) {
@@ -49,13 +53,18 @@ let UserController = UserController_1 = class UserController {
         return { points: user.points };
     }
     async getProfile(req) {
-        this.logger.debug(`User Profile request ==> ${JSON.stringify(req.user)}`);
+        this.logger.debug(`Profile request ==> ${JSON.stringify(req.user)}`);
         const user = await this.userService.findOneById(req.user.sub);
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
         const { password, ...profile } = user;
-        return profile;
+        console.log('profile ==>', user);
+        return user;
+    }
+    async updateProfile(req, updateData) {
+        this.logger.debug(`Profile request ===> ${req.user}`);
+        return this.userService.updateProfile(req.user.sub, updateData);
     }
     async getAllUsers() {
         return this.userService.findAll();
@@ -78,57 +87,40 @@ let UserController = UserController_1 = class UserController {
 };
 exports.UserController = UserController;
 __decorate([
-    (0, common_1.Post)('register'),
     (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'The record has been successfully created', type: create_user_dto_1.CreateUserDto }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad request', type: String }),
-    (0, swagger_1.ApiBody)({
-        schema: {
-            type: 'object',
-            properties: {
-                username: { type: 'string' },
-                password: { type: 'string' },
-                firstName: { type: 'string' },
-                lastName: { type: 'string' },
-                email: { type: 'string' },
-                role: {
-                    type: 'string',
-                    enum: ['USER', 'AGENT', 'ADMIN', 'DEVELOPER', 'MERCHANT', 'GUEST']
-                }
-            },
-        }
-    }),
+    (0, swagger_1.ApiBody)({ type: create_user_dto_1.CreateUserDto }),
+    (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "register", null);
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('local')),
-    (0, common_1.Post)('login'),
     (0, swagger_1.ApiOperation)({ summary: 'Login a user' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User logged in successfully', type: create_user_dto_1.CreateUserDto }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiBody)({
-        schema: {
-            type: 'object',
-            properties: {
-                username: { type: 'string', example: 'Peprah' },
-                password: { type: 'string', example: 'password123' },
-            },
-            required: ['email', 'password'],
-        }
-    }),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('local')),
+    (0, common_1.Post)('login'),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "login", null);
 __decorate([
-    (0, common_1.Post)('refresh-token'),
+    (0, swagger_1.ApiOperation)({ summary: 'Refresh user token' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Token refreshed successfully', type: create_user_dto_1.CreateUserDto }),
+    (0, common_1.UseGuards)(jwt_refresh_guard_1.JwtRefreshGuard),
+    (0, common_1.Post)('refresh'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "refreshToken", null);
+__decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Generate a new refresh token' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'New refresh token generated', type: String }),
     (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)('refresh-token'),
     __param(0, (0, common_1.Headers)('authorization')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -156,6 +148,19 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getProfile", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Update user profile' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Profile updated successfully', type: create_user_dto_1.CreateUserDto }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Put)('profile/update'),
+    (0, swagger_1.ApiBody)({ type: create_user_dto_1.CreateUserDto }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updateProfile", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get all users' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'List of users', type: [create_user_dto_1.CreateUserDto] }),
@@ -189,20 +194,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "deleteAllUsers", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Merchant login', description: 'Logs in a merchant using their client ID and client key.' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Merchant logged in successfully', type: create_user_dto_1.CreateUserDto }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized access', type: String }),
     (0, common_1.Post)('merchant/login'),
-    (0, swagger_1.ApiBody)({
-        schema: {
-            type: 'object',
-            properties: {
-                clientId: { type: 'string', description: 'Unique identifier for the merchant', example: 'merchant123' },
-                clientKey: { type: 'string', description: 'Secret key for the merchant', example: 'secretKey123' },
-            },
-            required: ['clientId', 'clientKey'],
-        }
-    }),
+    (0, swagger_1.ApiOperation)({ summary: 'Merchant login' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Merchant logged in successfully', type: create_user_dto_1.CreateUserDto }),
+    (0, swagger_1.ApiBody)({}),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

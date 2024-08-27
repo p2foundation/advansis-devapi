@@ -3,16 +3,13 @@ declare const UpdateMerchantDto_base: import("@nestjs/mapped-types").MappedType<
 export declare class UpdateMerchantDto extends UpdateMerchantDto_base {
     readonly name?: string;
     readonly email?: string;
-    readonly phone?: string;
+    readonly phoneNumber?: string;
     readonly password?: string;
-    address?: string;
-    city?: string;
+    readonly city?: string;
+    street?: string;
+    ghanaPostGPS?: string;
     state?: string;
+    zip?: string;
     country?: string;
-    zipCode?: string;
-    readonly GPSAddress?: string;
-    readonly clientId?: string;
-    readonly clientKey?: string;
-    readonly qrCode?: string;
 }
 export {};

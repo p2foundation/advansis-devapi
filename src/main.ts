@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
-import helmet from 'helmet'; // Add this import
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 import { SERVER_PORT } from './constants';
 
 async function bootstrap() {
@@ -24,7 +24,6 @@ async function bootstrap() {
     .setDescription(description)
     .setVersion('1.0')
     .addTag('lidapay')
-    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-doc', app, document);

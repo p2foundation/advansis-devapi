@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
+const swagger_1 = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const helmet_1 = require("helmet");
-const swagger_1 = require("@nestjs/swagger");
 const constants_1 = require("./constants");
 async function bootstrap() {
     const logger = new common_1.Logger(bootstrap.name);
@@ -22,7 +22,6 @@ async function bootstrap() {
         .setDescription(description)
         .setVersion('1.0')
         .addTag('lidapay')
-        .addBearerAuth()
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api-doc', app, document);

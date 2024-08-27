@@ -7,5 +7,5 @@ export declare class AirtimeController {
     constructor(airtimeService: AirtimeService);
     testAirtime(): string;
     queryTransactionstatus(qtsDto: TransStatusDto): Promise<any>;
-    processTopup(ptDto: TopupDto): Promise<any>;
+    processTopup(ptDto: TopupDto, req: any): Promise<any>;
 }

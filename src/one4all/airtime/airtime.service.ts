@@ -1,10 +1,15 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { catchError, map } from 'rxjs/operators';
 import * as https from 'https';
-import { ONE4ALL_APIKEY, ONE4ALL_APISECRET, ONE4ALL_BASEURL, ONE4ALL_RETAILER } from 'src/constants';
+import {
+  ONE4ALL_APIKEY,
+  ONE4ALL_APISECRET,
+  ONE4ALL_BASEURL,
+  ONE4ALL_RETAILER,
+} from 'src/constants';
 import { TransStatusDto } from './dto/transtatus.dto';
 import { TopupDto } from './dto/topup.dto';
 import { TransactionService } from 'src/transaction/transaction.service';
@@ -55,7 +60,7 @@ export class AirtimeService {
         catchError((tsError) => {
           this.logger.error(
             `Query TRANSACTION STATUS ERROR response ---- ${JSON.stringify(
-                tsError.response.data,
+              tsError.response.data,
             )}`,
           );
           const tsErrorMessage = tsError.response.data;
@@ -75,10 +80,9 @@ export class AirtimeService {
       transType: 'AIRTIME TOPUP',
       retailer: ONE4ALL_RETAILER || retailer,
       network: 0 || network,
-      recipient: recipientNumber || '',
       amount: amount || '',
       trxn: GeneratorUtil.generateTransactionId() || '',
-      originalAmount: '',
+      originalAmount: amount ||'',
       fee: 0,
       recipientNumber: recipientNumber || '',
       transMessage: '',
@@ -92,7 +96,7 @@ export class AirtimeService {
     // https://tppgh.myone4all.com/api/TopUpApi/airtime?retailer=233241603241&recipient=233244588584&amount=1&network=0&trxn=1234567890
     this.logger.log(`AIRTIME TOPUP params == ${JSON.stringify(taParams)}`);
 
-    const taUrl = `/TopUpApi/airtime?retailer=${taParams.retailer}&recipient=${taParams.recipient}&amount=${taParams.amount}&network=${taParams.network}&trxn=${taParams.trxn}`;
+    const taUrl = `/TopUpApi/airtime?retailer=${taParams.retailer}&recipient=${taParams.recipientNumber}&amount=${taParams.amount}&network=${taParams.network}&trxn=${taParams.trxn}`;
 
     const configs: any = {
       url: this.AirBaseUrl + taUrl,
@@ -147,7 +151,7 @@ export class AirtimeService {
 
             taParams.commentary = `Airtime top-up for ${recipientNumber} successful`;
 
-            this.transService.create(taParams );
+            this.transService.create(taParams);
           }
           return taRes.data;
         }),
@@ -157,7 +161,7 @@ export class AirtimeService {
               taError.response.data,
             )}`,
           );
-          
+
           const taErrorMessage = taError.response.data;
           throw new NotFoundException(taErrorMessage);
         }),

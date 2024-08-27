@@ -18,6 +18,7 @@ const common_1 = require("@nestjs/common");
 const psmobilemoney_service_1 = require("./psmobilemoney.service");
 const transfer_mobilemoney_dto_1 = require("./dto/transfer.mobilemoney.dto");
 const pay_mobilemoney_dto_1 = require("./dto/pay.mobilemoney.dto");
+const swagger_1 = require("@nestjs/swagger");
 let PsmobilemoneyController = PsmobilemoneyController_1 = class PsmobilemoneyController {
     constructor(psMobilemoneyService) {
         this.psMobilemoneyService = psMobilemoneyService;
@@ -37,6 +38,10 @@ let PsmobilemoneyController = PsmobilemoneyController_1 = class PsmobilemoneyCon
 exports.PsmobilemoneyController = PsmobilemoneyController;
 __decorate([
     (0, common_1.Post)('transfermoney'),
+    (0, swagger_1.ApiOperation)({ summary: 'Transfer mobile money' }),
+    (0, swagger_1.ApiBody)({ type: transfer_mobilemoney_dto_1.TransferMobileMoneyDto, description: 'Transfer mobile money request body' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Mobile money transferred successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid request' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [transfer_mobilemoney_dto_1.TransferMobileMoneyDto]),
@@ -44,13 +49,18 @@ __decorate([
 ], PsmobilemoneyController.prototype, "creditWallet", null);
 __decorate([
     (0, common_1.Post)('debitwallet'),
+    (0, swagger_1.ApiOperation)({ summary: 'Debit mobile money' }),
+    (0, swagger_1.ApiBody)({ type: pay_mobilemoney_dto_1.PayMobileMoneyDto, description: 'Debit mobile money request body' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Mobile money debited successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid request' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [pay_mobilemoney_dto_1.PayMobileMoneyDto]),
     __metadata("design:returntype", Promise)
 ], PsmobilemoneyController.prototype, "debitWallet", null);
 exports.PsmobilemoneyController = PsmobilemoneyController = PsmobilemoneyController_1 = __decorate([
-    (0, common_1.Controller)('api/psmobilemoney'),
+    (0, swagger_1.ApiTags)('PS Mobile Money'),
+    (0, common_1.Controller)('api/v1/psmobilemoney'),
     __metadata("design:paramtypes", [psmobilemoney_service_1.PsmobilemoneyService])
 ], PsmobilemoneyController);
 //# sourceMappingURL=psmobilemoney.controller.js.map

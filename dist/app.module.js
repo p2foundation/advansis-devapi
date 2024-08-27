@@ -10,59 +10,58 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
-const config_1 = require("@nestjs/config");
-const mongoose_1 = require("@nestjs/mongoose");
-const axios_1 = require("@nestjs/axios");
 const auth_module_1 = require("./auth/auth.module");
 const user_module_1 = require("./user/user.module");
-const constants_1 = require("./constants");
-const notification_module_1 = require("./notification/notification.module");
-const reloadly_module_1 = require("./reloadly/reloadly.module");
+const merchant_module_1 = require("./merchant/merchant.module");
+const affiliate_module_1 = require("./affiliate/affiliate.module");
 const reward_module_1 = require("./reward/reward.module");
 const transaction_module_1 = require("./transaction/transaction.module");
+const mongoose_1 = require("@nestjs/mongoose");
+const constants_1 = require("./constants");
+const email_service_1 = require("./utilities/email.service");
+const sms_util_1 = require("./utilities/sms.util");
+const axios_1 = require("@nestjs/axios");
+const config_1 = require("@nestjs/config");
+const notification_module_1 = require("./notification/notification.module");
+const reloadly_module_1 = require("./reloadly/reloadly.module");
+const prymo_module_1 = require("./prymo/prymo.module");
+const configuration_1 = require("./configs/configuration");
 const airtime_module_1 = require("./one4all/airtime/airtime.module");
 const internet_module_1 = require("./one4all/internet/internet.module");
-const mobilemoney_module_1 = require("./one4all/mobilemoney/mobilemoney.module");
-const sms_module_1 = require("./one4all/sms/sms.module");
-const pscardpayment_module_1 = require("./payswitch/pscardpayment/pscardpayment.module");
 const psmobilemoney_module_1 = require("./payswitch/psmobilemoney/psmobilemoney.module");
+const pscardpayment_module_1 = require("./payswitch/pscardpayment/pscardpayment.module");
+const sms_module_1 = require("./one4all/sms/sms.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot(),
+            config_1.ConfigModule.forRoot({
+                load: [configuration_1.default]
+            }),
             mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || constants_1.MONGODB_URI),
-            axios_1.HttpModule,
             auth_module_1.AuthModule,
             user_module_1.UserModule,
+            merchant_module_1.MerchantModule,
+            affiliate_module_1.AffiliateModule,
             reward_module_1.RewardModule,
             transaction_module_1.TransactionModule,
+            axios_1.HttpModule,
             notification_module_1.NotificationModule,
             reloadly_module_1.ReloadlyModule,
+            prymo_module_1.PrymoModule,
             airtime_module_1.AirtimeModule,
             internet_module_1.InternetModule,
-            mobilemoney_module_1.MobilemoneyModule,
-            sms_module_1.SmsModule,
-            pscardpayment_module_1.PscardpaymentModule,
             psmobilemoney_module_1.PsmobilemoneyModule,
+            pscardpayment_module_1.PscardpaymentModule,
+            sms_module_1.SmsModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [
-            {
-                provide: app_service_1.AppService,
-                useClass: app_service_1.AppService,
-            },
-            {
-                provide: 'APP_NAME',
-                useValue: 'Advansis API v1.0.0',
-            },
-            {
-                provide: 'MESSAGE',
-                inject: ['APP_NAME'],
-                useFactory: (appName) => `Hello, ${appName}!`,
-            },
+            app_service_1.AppService,
+            email_service_1.EmailService,
+            sms_util_1.SmsService
         ],
     })
 ], AppModule);

@@ -19,7 +19,7 @@ let MerchantAuthGuard = class MerchantAuthGuard {
     canActivate(context) {
         const request = context.switchToHttp().getRequest();
         const merchant = request.user;
-        if (!merchant || merchant.role.toLowerCase() !== 'merchant') {
+        if (!merchant || merchant.role !== 'merchant') {
             throw new common_1.UnauthorizedException('Access Denied: Only authorized merchants can access this service');
         }
         return true;

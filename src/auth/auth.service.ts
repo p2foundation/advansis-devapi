@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { PasswordUtil } from '../utilities/password.util';
 import { TokenUtil } from '../utilities/token.util';
 import { JwtService } from '@nestjs/jwt'; // Import JwtService
+import { JWT_EXPIRE, JWT_SECRET } from 'src/constants';
 import { MerchantService } from 'src/merchant/merchant.service';
 
 @Injectable()
@@ -18,7 +19,7 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<any> {
     this.logger.log(`validateUser: ${username}, ${password}`);
     const user = await this.userService.findOneByUsername(username);
-    // this.logger.log('ValidateUser findOneByUsername ==>', user);
+    this.logger.log('ValidateUser findOneByUsername ==>', user);
 
     if (user && PasswordUtil.comparePassword(password, user.password)) {
       const { password, ...result } = user;
@@ -28,7 +29,7 @@ export class AuthService {
   }
 
   async login(user: any): Promise<any> {
-    this.logger.verbose(`Login User ==> ${JSON.stringify(user)}`);
+    // this.logger.verbose(`Login User ==> ${JSON.stringify(user)}`);
     try {
       const payload = {
         username: user._doc.username,
@@ -38,7 +39,7 @@ export class AuthService {
 
       this.logger.log(`Login Payload ===> ${JSON.stringify(payload)}`);
 
-      const accessToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
+      const accessToken = this.jwtService.sign(payload, { secret: JWT_SECRET });
       const refreshToken = this.generateRefreshToken(payload);
 
       return {
@@ -48,7 +49,7 @@ export class AuthService {
       };
     } catch (error) {
       console.error('Error during login:', error);
-      throw new BadRequestException('Failed to generate tokens');
+      throw new Error('Failed to generate tokens');
     }
   }
 
@@ -102,7 +103,7 @@ export class AuthService {
         // email: merchant.email
       };
 
-      const accessToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
+      const accessToken = this.jwtService.sign(payload, { secret: JWT_SECRET });
       const refreshToken = this.generateRefreshToken(payload);
 
       // Update last login timestamp

@@ -16,11 +16,12 @@ const constants_1 = require("../constants");
 let EmailService = class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: constants_1.GMAIL_MAIL_SERVICE,
+            port: constants_1.GMAIL_MAIL_PORT,
             secure: false,
             auth: {
-                user: process.env.EMAIL_ADDRESS || constants_1.EMAIL_ADDRESS,
-                pass: process.env.EMAIL_PASSWORD || constants_1.EMAIL_PASSWORD
+                user: constants_1.EMAIL_ADDRESS || process.env.EMAIL_ADDRESS,
+                pass: constants_1.EMAIL_PASSWORD || process.env.EMAIL_PASSWORD
             },
             tls: {
                 rejectUnauthorized: false

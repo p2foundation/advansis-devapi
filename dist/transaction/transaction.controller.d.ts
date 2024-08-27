@@ -7,7 +7,6 @@ export declare class TransactionController {
     create(createTransactionDto: CreateTransactionDto): Promise<import("./schemas/transaction.schema").Transaction>;
     findAll(): Promise<import("./schemas/transaction.schema").Transaction[]>;
     findOne(transactionId: string): Promise<import("./schemas/transaction.schema").Transaction>;
-    getTransactionHistory(userId: string, filter?: string): Promise<import("./schemas/transaction.schema").Transaction[]>;
     update(transactionId: string, updateTransactionDto: UpdateTransactionDto): Promise<import("./schemas/transaction.schema").Transaction>;
     delete(transactionId: string): Promise<void>;
 }

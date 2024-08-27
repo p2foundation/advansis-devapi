@@ -10,12 +10,6 @@ export class Reward {
 
   @Prop({ required: true })
   points: number;
-  
-  @Prop({ required: false })
-  rewardType: string;
-
-  @Prop({ required: false })
-  expirationDate: Date;
 
   @Prop()
   history: Array<{

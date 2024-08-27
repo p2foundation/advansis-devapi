@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var RewardController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RewardController = void 0;
 const common_1 = require("@nestjs/common");
@@ -20,18 +19,11 @@ const create_reward_dto_1 = require("./dto/create-reward.dto");
 const update_reward_dto_1 = require("./dto/update-reward.dto");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const swagger_1 = require("@nestjs/swagger");
-let RewardController = RewardController_1 = class RewardController {
+let RewardController = class RewardController {
     constructor(rewardService) {
         this.rewardService = rewardService;
-        this.logger = new common_1.Logger(RewardController_1.name);
     }
-    async create(createRewardDto, req) {
-        this.logger.log(`RewardDto ==> ${JSON.stringify(createRewardDto)}`);
-        console.debug('req.user +++ ', req.user);
-        if (!req.user || !req.user.sub) {
-            throw new Error('User ID is not available in the request');
-        }
-        createRewardDto.userId = req.user.sub;
+    async create(createRewardDto) {
         return this.rewardService.create(createRewardDto);
     }
     async findAll() {
@@ -50,28 +42,33 @@ let RewardController = RewardController_1 = class RewardController {
 exports.RewardController = RewardController;
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Post)('create'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new reward' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'The reward has been successfully created', type: create_reward_dto_1.CreateRewardDto }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad request', type: String }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized', type: String }),
-    (0, swagger_1.ApiResponse)({ status: 409, description: 'Reward already exists', type: String }),
     (0, swagger_1.ApiBody)({
+        description: 'Reward creation details',
         schema: {
             type: 'object',
+            required: ['name', 'description', 'points'],
             properties: {
-                name: { type: 'string', example: 'Reward Name' },
-                reason: { type: 'string', example: 'Reward Description' },
-                points: { type: 'number', example: 100 },
-                expirationDate: { type: 'string', example: '2023-01-01' },
+                name: {
+                    type: 'string',
+                    description: 'The name of the reward',
+                },
+                description: {
+                    type: 'string',
+                    description: 'A brief description of the reward',
+                },
+                points: {
+                    type: 'integer',
+                    description: 'The number of points required to redeem the reward',
+                },
             },
-            required: ['name', 'reason', 'points',],
         },
     }),
+    (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_reward_dto_1.CreateRewardDto, Object]),
+    __metadata("design:paramtypes", [create_reward_dto_1.CreateRewardDto]),
     __metadata("design:returntype", Promise)
 ], RewardController.prototype, "create", null);
 __decorate([
@@ -114,7 +111,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], RewardController.prototype, "delete", null);
-exports.RewardController = RewardController = RewardController_1 = __decorate([
+exports.RewardController = RewardController = __decorate([
     (0, swagger_1.ApiTags)('rewards'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('api/v1/rewards'),

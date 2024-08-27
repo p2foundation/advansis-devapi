@@ -24,15 +24,15 @@ let TransactionService = class TransactionService {
         this.transactionModel = transactionModel;
         this.merchantService = merchantService;
     }
-    async create(transDto) {
+    async create(createTransactionDto) {
         const createdTransaction = new this.transactionModel({
-            ...transDto,
+            ...createTransactionDto,
             status: 'pending',
             transactionId: this.generateTransactionId(),
         });
         const savedTransaction = await createdTransaction.save();
-        if (transDto.referrerClientId) {
-            await this.merchantService.updateRewardPoints(transDto.referrerClientId, 5);
+        if (createTransactionDto.referrerClientId) {
+            await this.merchantService.updateRewardPoints(createTransactionDto.referrerClientId, 5);
         }
         return savedTransaction;
     }
@@ -47,13 +47,6 @@ let TransactionService = class TransactionService {
     }
     async delete(transactionId) {
         await this.transactionModel.findOneAndDelete({ transactionId }).exec();
-    }
-    async getTransactionHistory(userId, filter) {
-        const query = { userId };
-        if (filter) {
-            query['status'] = filter;
-        }
-        return this.transactionModel.find(query).exec();
     }
     generateTransactionId() {
         return 'txn_' + crypto.randomBytes(4).toString('hex');

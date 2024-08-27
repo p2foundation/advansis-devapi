@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -23,14 +23,11 @@ export class UserService {
     private readonly merchantService: MerchantService,
 
   ) { }
+
   async create(userDto: CreateUserDto): Promise<User> {
     try {
       if (!ValidationUtil.isValidEmail(userDto.email)) {
         throw new Error('Invalid email address');
-      }
-      const existingUser = await this.userModel.findOne({ email: userDto.email }).exec();
-      if (existingUser) {
-        throw new BadRequestException('User already registered');
       }
       const hashedPassword = await PasswordUtil.hashPassword(userDto.password);
       const gravatarUrl = await this.gravatarService.fetchAvatar(userDto.email);

@@ -58,10 +58,9 @@ let AirtimeService = AirtimeService_1 = class AirtimeService {
             transType: 'AIRTIME TOPUP',
             retailer: constants_1.ONE4ALL_RETAILER || retailer,
             network: 0 || network,
-            recipient: recipientNumber || '',
             amount: amount || '',
             trxn: generator_util_1.GeneratorUtil.generateTransactionId() || '',
-            originalAmount: '',
+            originalAmount: amount || '',
             fee: 0,
             recipientNumber: recipientNumber || '',
             transMessage: '',
@@ -72,7 +71,7 @@ let AirtimeService = AirtimeService_1 = class AirtimeService {
             currentBalance: '',
         };
         this.logger.log(`AIRTIME TOPUP params == ${JSON.stringify(taParams)}`);
-        const taUrl = `/TopUpApi/airtime?retailer=${taParams.retailer}&recipient=${taParams.recipient}&amount=${taParams.amount}&network=${taParams.network}&trxn=${taParams.trxn}`;
+        const taUrl = `/TopUpApi/airtime?retailer=${taParams.retailer}&recipient=${taParams.recipientNumber}&amount=${taParams.amount}&network=${taParams.network}&trxn=${taParams.trxn}`;
         const configs = {
             url: this.AirBaseUrl + taUrl,
             headers: { ApiKey: constants_1.ONE4ALL_APIKEY, ApiSecret: constants_1.ONE4ALL_APISECRET },

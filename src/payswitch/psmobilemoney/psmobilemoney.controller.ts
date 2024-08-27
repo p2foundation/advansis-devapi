@@ -3,25 +3,20 @@ import { PsmobilemoneyService } from './psmobilemoney.service';
 import { Response } from 'express'
 import { TransferMobileMoneyDto } from './dto/transfer.mobilemoney.dto';
 import { PayMobileMoneyDto } from './dto/pay.mobilemoney.dto';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@Controller('api/psmobilemoney')
+@ApiTags('PS Mobile Money')
+@Controller('api/v1/psmobilemoney')
 export class PsmobilemoneyController {
     private logger = new Logger(PsmobilemoneyController.name);
-    constructor(
-        private psMobilemoneyService: PsmobilemoneyService
-    ) { }
 
-    // @Get('gtcallback')
-    // async receiveWalletCallback(
-    //     @Res() res: Response,
-    //     @Query() qr: CallbackWalletDto,
-    // ) {
-    //     const wc = await qr;
-    //     this.logger.log(`query Telco push response ??? ${JSON.stringify(wc)}`);
-    //     res.status(HttpStatus.CREATED).send(wc);
-    // }
+    constructor(private psMobilemoneyService: PsmobilemoneyService) { }
 
     @Post('transfermoney')
+    @ApiOperation({ summary: 'Transfer mobile money' })
+    @ApiBody({ type: TransferMobileMoneyDto, description: 'Transfer mobile money request body' })
+    @ApiResponse({ status: 201, description: 'Mobile money transferred successfully' })
+    @ApiResponse({ status: 400, description: 'Invalid request' })
     public async creditWallet(
         @Body() transDto: TransferMobileMoneyDto,
     ) {
@@ -30,6 +25,10 @@ export class PsmobilemoneyController {
     }
 
     @Post('debitwallet')
+    @ApiOperation({ summary: 'Debit mobile money' })
+    @ApiBody({ type: PayMobileMoneyDto, description: 'Debit mobile money request body' })
+    @ApiResponse({ status: 201, description: 'Mobile money debited successfully' })
+    @ApiResponse({ status: 400, description: 'Invalid request' })
     public async debitWallet(
         @Body() transDto: PayMobileMoneyDto,
     ) {
@@ -38,21 +37,4 @@ export class PsmobilemoneyController {
         this.logger.debug(`db money init response ===> ${JSON.stringify(dw)}`);
         return dw;
     }
-
-    //   @Post('testPost')
-    //   async testPost(
-    //     @Body() transDto: CallbackWalletDto,
-    //   ) {
-    //     const dw = await this.transactionService.walletCallback(transDto);
-    //     return dw;
-    //   }
-
-    //   @Post('mostatus')
-    //   async transStatus(
-    //     @Body() transDto: TransStatusDto,
-    //   ) {
-    //     const ts = await this.transactionService.checkTransStatus(transDto);
-    //     return ts;
-    //   }
-
 }

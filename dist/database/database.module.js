@@ -6,19 +6,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BillpaymentsModule = void 0;
-const axios_1 = require("@nestjs/axios");
+exports.DatabaseModule = void 0;
 const common_1 = require("@nestjs/common");
-const billpayments_controller_1 = require("./billpayments.controller");
-const billpayments_service_1 = require("./billpayments.service");
-let BillpaymentsModule = class BillpaymentsModule {
+const database_providers_1 = require("./database.providers");
+let DatabaseModule = class DatabaseModule {
 };
-exports.BillpaymentsModule = BillpaymentsModule;
-exports.BillpaymentsModule = BillpaymentsModule = __decorate([
+exports.DatabaseModule = DatabaseModule;
+exports.DatabaseModule = DatabaseModule = __decorate([
     (0, common_1.Module)({
-        imports: [axios_1.HttpModule],
-        providers: [billpayments_service_1.BillpaymentsService],
-        controllers: [billpayments_controller_1.BillpaymentsController],
+        providers: [...database_providers_1.databaseProviders],
+        exports: [...database_providers_1.databaseProviders],
     })
-], BillpaymentsModule);
-//# sourceMappingURL=billpayments.module.js.map
+], DatabaseModule);
+//# sourceMappingURL=database.module.js.map

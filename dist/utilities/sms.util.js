@@ -15,9 +15,7 @@ const constants_1 = require("../constants");
 const twilio_1 = require("twilio");
 let SmsService = class SmsService {
     constructor() {
-        this.ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || constants_1.TWILIO_ACCOUNT_SID;
-        this.AUTH_TOKEN = process.env.TWILIO_TOKEN || constants_1.TWILIO_TOKEN;
-        this.client = new twilio_1.Twilio(this.ACCOUNT_SID, this.AUTH_TOKEN);
+        this.client = new twilio_1.Twilio(constants_1.TWILIO_ACCOUNT_SID, constants_1.TWILIO_TOKEN);
     }
     async sendSms(to, body) {
         return this.client.messages.create({

@@ -37,7 +37,17 @@ let MerchantService = class MerchantService {
             password: hashedPassword,
             clientId,
             clientKey,
-            qrCode
+            qrCode,
+            address: [
+                {
+                    ghanaPostGPS: createMerchantDto.ghanaPostGPS,
+                    street: createMerchantDto.street,
+                    city: createMerchantDto.city,
+                    state: createMerchantDto.state,
+                    zip: createMerchantDto.zip,
+                    country: createMerchantDto.country,
+                }
+            ]
         };
         const createdMerchant = new this.merchantModel(merchantData);
         return createdMerchant.save();
@@ -65,20 +75,6 @@ let MerchantService = class MerchantService {
     }
     async updateRewardPoints(clientId, points) {
         await this.merchantModel.updateOne({ clientId }, { $inc: { rewardPoints: points } }).exec();
-    }
-    async generateQrCode(merchantId) {
-        const merchant = await this.merchantModel.findById(merchantId).exec();
-        if (!merchant) {
-            throw new Error('Merchant not found');
-        }
-        return merchant.qrCode;
-    }
-    async viewRewards(merchantId) {
-        const merchant = await this.merchantModel.findById(merchantId).exec();
-        if (!merchant) {
-            throw new Error('Merchant not found');
-        }
-        return { rewardPoints: merchant.rewardPoints };
     }
 };
 exports.MerchantService = MerchantService;

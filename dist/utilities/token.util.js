@@ -22,7 +22,7 @@ class TokenUtil {
     static verifyToken(token) {
         console.debug(`TokenUtil, VerifyToken input: ${JSON.stringify(token)}`);
         try {
-            return (0, jsonwebtoken_1.verify)(token, secretKey);
+            return (0, jsonwebtoken_1.verify)(token, constants_1.JWT_SECRET);
         }
         catch (error) {
             console.error(`Error verifying token: ${error.message}`);

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Delete, Param, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Delete, Param, UseGuards, Request } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
@@ -35,14 +35,6 @@ export class TransactionController {
   @Get(':transactionId')
   async findOne(@Param('transactionId') transactionId: string) {
     return this.transactionService.findOne(transactionId);
-  }
-
-  @Get('history')
-  @ApiOperation({ summary: 'Get transaction history' })
-  @ApiResponse({ status: 200, description: 'Transaction history retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized access' })
-  async getTransactionHistory(@Query('userId') userId: string, @Query('filter') filter?: string) {
-    return this.transactionService.getTransactionHistory(userId, filter);
   }
 
   @UseGuards(JwtAuthGuard)

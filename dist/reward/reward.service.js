@@ -11,43 +11,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var RewardService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RewardService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const reward_schema_1 = require("./schemas/reward.schema");
-let RewardService = RewardService_1 = class RewardService {
+let RewardService = class RewardService {
     constructor(rewardModel) {
         this.rewardModel = rewardModel;
-        this.logger = new common_1.Logger(RewardService_1.name);
     }
     async create(createRewardDto) {
-        this.logger.debug('createRewardDto +++ ', createRewardDto);
         const createdReward = new this.rewardModel({
             ...createRewardDto,
-            userId: createRewardDto.userId,
-            history: [
-                {
-                    date: new Date(),
-                    points: createRewardDto.points,
-                    reason: createRewardDto.reason || 'Initial points',
-                },
-            ],
+            history: [{ date: new Date(), points: createRewardDto.points, reason: 'Initial points' }]
         });
         return createdReward.save();
     }
     async findAll() {
-        const rewards = await this.rewardModel.find().exec();
-        const totalPoints = rewards.reduce((acc, reward) => acc + reward.points, 0);
-        const totalCount = rewards.length;
-        return { rewards, totalPoints, totalCount };
+        return this.rewardModel.find().exec();
     }
     async findOne(userId) {
-        const reward = await this.rewardModel.findOne({ userId }).exec();
-        const totalPoints = reward.history.reduce((acc, item) => acc + item.points, 0);
-        return { reward, totalPoints };
+        return this.rewardModel.findOne({ userId }).exec();
     }
     async update(userId, updateRewardDto) {
         const reward = await this.rewardModel.findOne({ userId }).exec();
@@ -55,11 +40,7 @@ let RewardService = RewardService_1 = class RewardService {
             throw new Error('Reward not found');
         }
         reward.points += updateRewardDto.points;
-        reward.history.push({
-            date: new Date(),
-            points: updateRewardDto.points,
-            reason: updateRewardDto.reason,
-        });
+        reward.history.push({ date: new Date(), points: updateRewardDto.points, reason: updateRewardDto.reason });
         return reward.save();
     }
     async delete(userId) {
@@ -67,7 +48,7 @@ let RewardService = RewardService_1 = class RewardService {
     }
 };
 exports.RewardService = RewardService;
-exports.RewardService = RewardService = RewardService_1 = __decorate([
+exports.RewardService = RewardService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(reward_schema_1.Reward.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])

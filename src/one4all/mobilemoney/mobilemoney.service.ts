@@ -20,24 +20,6 @@ export class MobilemoneyService {
 
   constructor(private httpService: HttpService) {}
 
-  // walletCallback(transDto: CallbackWalletDto): Observable<AxiosResponse<CallbackWalletDto>> {
-  //     const { Status, Transactionid, Message, MerchantReference } = transDto;
-  //     const data = { Status, Transactionid, Message, MerchantReference };
-  //     const payload = { data };
-
-  //     const configs = {
-  //         url: this.callbackUrl,
-  //         body: payload,
-  //     };
-  //     this.logger.log(`test post payload == ${JSON.stringify(configs)}`);
-  //     return this.httpService.post(configs.url, configs.body).pipe(
-  //         map(wcRes => {
-  //             this.logger.log(`service response STATUS ==  ${JSON.stringify(wcRes.data)}`);
-  //             return wcRes.data;
-  //         }),
-  //     );
-  // }
-
   sendMobileMoney(
     transDto: SendMoneyDto,
   ): Observable<AxiosResponse<SendMoneyDto>> {

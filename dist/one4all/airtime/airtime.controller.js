@@ -15,9 +15,11 @@ var AirtimeController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AirtimeController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const airtime_service_1 = require("./airtime.service");
 const topup_dto_1 = require("./dto/topup.dto");
 const transtatus_dto_1 = require("./dto/transtatus.dto");
+const jwt_auth_guard_1 = require("../../auth/jwt-auth.guard");
 let AirtimeController = AirtimeController_1 = class AirtimeController {
     constructor(airtimeService) {
         this.airtimeService = airtimeService;
@@ -31,38 +33,94 @@ let AirtimeController = AirtimeController_1 = class AirtimeController {
         const ts = await this.airtimeService.transactionStatus(qtsDto);
         return ts;
     }
-    async processTopup(ptDto) {
+    async processTopup(ptDto, req) {
         this.logger.log(`topup airtime dto => ${JSON.stringify(ptDto)}`);
+        this.logger.debug(`topup request() => ${JSON.stringify(req.user)}`);
+        ptDto.userId = req.user.sub;
         if (!ptDto.userId || typeof ptDto.userId !== 'string') {
             throw new common_1.BadRequestException('Invalid userId');
         }
-        const ta = await this.airtimeService.topupAirtimeService(ptDto);
-        return ta;
+        return this.airtimeService.topupAirtimeService(ptDto);
     }
 };
 exports.AirtimeController = AirtimeController;
 __decorate([
     (0, common_1.Get)('testopup'),
+    (0, swagger_1.ApiOperation)({ summary: 'Test airtime top-up' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Airtime top-up processing...' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AirtimeController.prototype, "testAirtime", null);
 __decorate([
     (0, common_1.Post)('/transtatus'),
+    (0, swagger_1.ApiOperation)({ summary: 'Query transaction status' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            required: ['transactionId'],
+            properties: {
+                transactionId: {
+                    type: 'string',
+                    description: 'Client transactionId',
+                },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Transaction status retrieved successfully',
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [transtatus_dto_1.TransStatusDto]),
     __metadata("design:returntype", Promise)
 ], AirtimeController.prototype, "queryTransactionstatus", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('/topup'),
+    (0, swagger_1.ApiOperation)({ summary: 'Process airtime top-up' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            required: ['recipientNumber', 'amount', 'network'],
+            properties: {
+                recipientNumber: {
+                    type: 'string',
+                    description: 'The recipient phone number',
+                    pattern: '^\\+?[1-9]\\d{1,14}$',
+                },
+                amount: {
+                    type: 'number',
+                    description: 'The amount to be transferred',
+                    minimum: 1,
+                },
+                network: {
+                    type: 'string',
+                    description: 'The recipient mobile network provider',
+                    enum: ['airtel', 'mtn', 'glo', '9mobile'],
+                },
+                userId: {
+                    type: 'string',
+                    description: 'The user ID',
+                },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Airtime top-up processed successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid userId' }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [topup_dto_1.TopupDto]),
+    __metadata("design:paramtypes", [topup_dto_1.TopupDto, Object]),
     __metadata("design:returntype", Promise)
 ], AirtimeController.prototype, "processTopup", null);
 exports.AirtimeController = AirtimeController = AirtimeController_1 = __decorate([
-    (0, common_1.Controller)('api/airtime'),
+    (0, swagger_1.ApiTags)('Airtime'),
+    (0, common_1.Controller)('api/v1/airtime'),
     __metadata("design:paramtypes", [airtime_service_1.AirtimeService])
 ], AirtimeController);
 //# sourceMappingURL=airtime.controller.js.map

@@ -17,57 +17,35 @@ export class UserController {
     private readonly authService: AuthService,
   ) { }
 
- 
-  @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created', type: CreateUserDto })
-  @ApiResponse({ status: 400, description: 'Bad request', type: String })
-  @ApiBody({ 
-    schema: {
-      type: 'object',
-      properties: {
-        username: { type: 'string' },
-        password: { type: 'string' },
-        firstName: { type: 'string' },
-        lastName: { type: 'string' },
-        email: { type: 'string' },
-        role: {
-          type: 'string',
-          enum: ['USER', 'AGENT', 'ADMIN', 'DEVELOPER', 'MERCHANT', 'GUEST']
-        }
-      },
-    }
-  })
+  @ApiBody({ type: CreateUserDto })
+  @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     this.logger.debug(`UserDto ==> ${JSON.stringify(createUserDto)}`);
     return this.userService.create(createUserDto);
   }
 
- 
-  @UseGuards(AuthGuard('local'))
-  @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({ status: 200, description: 'User logged in successfully', type: CreateUserDto })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        username: { type: 'string', example: 'Peprah' },
-        password: { type: 'string', example: 'password123' },
-      },
-      required: ['email', 'password'],
-    }
-  })
+  @UseGuards(AuthGuard('local'))
+  @Post('login')
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
+  @ApiOperation({ summary: 'Refresh user token' })
+  @ApiResponse({ status: 200, description: 'Token refreshed successfully', type: CreateUserDto })
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh')
+  async refreshToken(@Request() req) {
+    return this.authService.refreshToken(req.user);
+  }
 
-  @Post('refresh-token')
   @ApiOperation({ summary: 'Generate a new refresh token' })
   @ApiResponse({ status: 200, description: 'New refresh token generated', type: String })
   @ApiBearerAuth()
+  @Post('refresh-token')
   async genRefreshToken(@Headers('authorization') authHeader: string) {
     if (!authHeader) {
       throw new Error('No authorization header provided');
@@ -90,21 +68,33 @@ export class UserController {
     const user = await this.userService.findOneById(req.user.sub);
     return { points: user.points };
   }
+
   @ApiOperation({ summary: 'Get user profile' })
   @ApiResponse({ status: 200, description: 'User profile retrieved', type: CreateUserDto })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('profile')
   async getProfile(@Request() req) {
-    this.logger.debug(`User Profile request ==> ${JSON.stringify(req.user)}`);
+    this.logger.debug(`Profile request ==> ${JSON.stringify(req.user)}`);
     const user = await this.userService.findOneById(req.user.sub);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     const { password, ...profile } = user;
-    return profile; // Corrected to return the profile without password
+    console.log('profile ==>',user);
+    return user;
   }
 
+  @ApiOperation({ summary: 'Update user profile' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully', type: CreateUserDto })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Put('profile/update')
+  @ApiBody({ type: CreateUserDto })
+  async updateProfile(@Request() req, @Body() updateData: any) {
+    this.logger.debug(`Profile request ===> ${req.user}`);
+    return this.userService.updateProfile(req.user.sub, updateData);
+  }
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of users', type: [CreateUserDto] })
@@ -136,20 +126,11 @@ export class UserController {
     return this.userService.deleteAllUsers();
   }
 
-  @ApiOperation({ summary: 'Merchant login', description: 'Logs in a merchant using their client ID and client key.' })
-  @ApiResponse({ status: 200, description: 'Merchant logged in successfully', type: CreateUserDto })
-  @ApiResponse({ status: 401, description: 'Unauthorized access', type: String })
+ 
   @Post('merchant/login')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        clientId: { type: 'string', description: 'Unique identifier for the merchant', example: 'merchant123' },
-        clientKey: { type: 'string', description: 'Secret key for the merchant', example: 'secretKey123' },
-      },
-      required: ['clientId', 'clientKey'],
-    }
-  })
+  @ApiOperation({ summary: 'Merchant login' })
+  @ApiResponse({ status: 200, description: 'Merchant logged in successfully', type: CreateUserDto })
+  @ApiBody({  })
   async merchantLogin(@Body() loginDto: { clientId: string; clientKey: string }) {
     const merchant = await this.authService.validateMerchant(loginDto.clientId, loginDto.clientKey);
     if (!merchant) {

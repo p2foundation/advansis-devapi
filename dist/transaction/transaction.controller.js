@@ -32,9 +32,6 @@ let TransactionController = class TransactionController {
     async findOne(transactionId) {
         return this.transactionService.findOne(transactionId);
     }
-    async getTransactionHistory(userId, filter) {
-        return this.transactionService.getTransactionHistory(userId, filter);
-    }
     async update(transactionId, updateTransactionDto) {
         return this.transactionService.update(transactionId, updateTransactionDto);
     }
@@ -75,17 +72,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], TransactionController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Get)('history'),
-    (0, swagger_1.ApiOperation)({ summary: 'Get transaction history' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Transaction history retrieved successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized access' }),
-    __param(0, (0, common_1.Query)('userId')),
-    __param(1, (0, common_1.Query)('filter')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", Promise)
-], TransactionController.prototype, "getTransactionHistory", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),

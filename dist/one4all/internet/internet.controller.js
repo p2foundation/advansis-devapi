@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InternetController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const internet_dto_1 = require("./dto/internet.dto");
 const internet_service_1 = require("./internet.service");
 let InternetController = class InternetController {
@@ -35,6 +36,10 @@ let InternetController = class InternetController {
 exports.InternetController = InternetController;
 __decorate([
     (0, common_1.Post)('/buydata'),
+    (0, swagger_1.ApiOperation)({ summary: 'Buy internet data' }),
+    (0, swagger_1.ApiBody)({ type: internet_dto_1.InternetDto }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Successful response' }),
+    (0, swagger_1.ApiResponse)({ status: 500, description: 'Internal Server Error' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [internet_dto_1.InternetDto]),
@@ -42,13 +47,18 @@ __decorate([
 ], InternetController.prototype, "buyInternetData", null);
 __decorate([
     (0, common_1.Post)('/bundlelist'),
+    (0, swagger_1.ApiOperation)({ summary: 'List data bundles' }),
+    (0, swagger_1.ApiBody)({ type: internet_dto_1.InternetDto }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Successful response' }),
+    (0, swagger_1.ApiResponse)({ status: 500, description: 'Internal Server Error' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [internet_dto_1.InternetDto]),
     __metadata("design:returntype", Promise)
 ], InternetController.prototype, "listDataBundle", null);
 exports.InternetController = InternetController = __decorate([
-    (0, common_1.Controller)('api/internet'),
+    (0, swagger_1.ApiTags)('internet'),
+    (0, common_1.Controller)('api/v1/internet'),
     __metadata("design:paramtypes", [internet_service_1.InternetService])
 ], InternetController);
 //# sourceMappingURL=internet.controller.js.map

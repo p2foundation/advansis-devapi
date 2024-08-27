@@ -3,8 +3,6 @@ export type RewardDocument = Reward & Document;
 export declare class Reward {
     userId: string;
     points: number;
-    rewardType: string;
-    expirationDate: Date;
     history: Array<{
         date: Date;
         points: number;

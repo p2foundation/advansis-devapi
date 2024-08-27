@@ -12,7 +12,7 @@ export class Merchant {
   email: string;
 
   @Prop({ required: true })
-  phone: string;
+  phoneNumber: string;
 
   @Prop({ required: true, unique: true })
   clientId: string;
@@ -29,23 +29,15 @@ export class Merchant {
   @Prop({ default: 0 })
   rewardPoints: number;
 
-  @Prop({ required: false })
-  address: string;
-  @Prop({ required: false })
-  city: string;
-  @Prop({ required: false })
-  state: string;
-  @Prop({ required: false })
-  country: string;
-  @Prop({ required: false })
-  zipCode: string;
-  @Prop({ required: false })
-  GPSAddress: string;
-
-  @Prop({ default: false })
-  isVerified: boolean;
-  @Prop({ default: false })
-  isActive: boolean;
+  @Prop()
+  address?: Array<{
+    ghanaPostGPS: string,
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string,
+  }>;
   
   @Prop()
   lastLogin: Date;

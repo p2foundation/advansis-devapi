@@ -8,26 +8,13 @@ export declare class UserController {
     constructor(userService: UserService, authService: AuthService);
     register(createUserDto: CreateUserDto): Promise<import("./schemas/user.schema").User>;
     login(req: any): Promise<any>;
+    refreshToken(req: any): Promise<any>;
     genRefreshToken(authHeader: string): Promise<any>;
     getPoints(req: any): Promise<{
         points: number;
     }>;
-    getProfile(req: any): Promise<{
-        username: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        phoneNumber: string;
-        gravatar: string;
-        roles: string[];
-        qrCode: string;
-        points: number;
-        status: string;
-        emailVerified: boolean;
-        phoneVerified: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-    }>;
+    getProfile(req: any): Promise<import("./schemas/user.schema").User>;
+    updateProfile(req: any, updateData: any): Promise<import("./schemas/user.schema").User>;
     getAllUsers(): Promise<{
         users: import("./schemas/user.schema").User[];
         totalCount: number;

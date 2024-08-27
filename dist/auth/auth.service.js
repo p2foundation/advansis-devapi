@@ -16,6 +16,7 @@ const user_service_1 = require("../user/user.service");
 const password_util_1 = require("../utilities/password.util");
 const token_util_1 = require("../utilities/token.util");
 const jwt_1 = require("@nestjs/jwt");
+const constants_1 = require("../constants");
 const merchant_service_1 = require("../merchant/merchant.service");
 let AuthService = AuthService_1 = class AuthService {
     constructor(userService, jwtService, merchantService) {
@@ -27,6 +28,7 @@ let AuthService = AuthService_1 = class AuthService {
     async validateUser(username, password) {
         this.logger.log(`validateUser: ${username}, ${password}`);
         const user = await this.userService.findOneByUsername(username);
+        this.logger.log('ValidateUser findOneByUsername ==>', user);
         if (user && password_util_1.PasswordUtil.comparePassword(password, user.password)) {
             const { password, ...result } = user;
             return result;
@@ -34,7 +36,6 @@ let AuthService = AuthService_1 = class AuthService {
         return null;
     }
     async login(user) {
-        this.logger.verbose(`Login User ==> ${JSON.stringify(user)}`);
         try {
             const payload = {
                 username: user._doc.username,
@@ -42,7 +43,7 @@ let AuthService = AuthService_1 = class AuthService {
                 roles: user._doc.roles,
             };
             this.logger.log(`Login Payload ===> ${JSON.stringify(payload)}`);
-            const accessToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
+            const accessToken = this.jwtService.sign(payload, { secret: constants_1.JWT_SECRET });
             const refreshToken = this.generateRefreshToken(payload);
             return {
                 access_token: accessToken,
@@ -51,7 +52,7 @@ let AuthService = AuthService_1 = class AuthService {
         }
         catch (error) {
             console.error('Error during login:', error);
-            throw new common_1.BadRequestException('Failed to generate tokens');
+            throw new Error('Failed to generate tokens');
         }
     }
     generateRefreshToken(payload) {
@@ -94,7 +95,7 @@ let AuthService = AuthService_1 = class AuthService {
                 sub: merchant._id,
                 roles: ['merchant'],
             };
-            const accessToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
+            const accessToken = this.jwtService.sign(payload, { secret: constants_1.JWT_SECRET });
             const refreshToken = this.generateRefreshToken(payload);
             await this.merchantService.updateLastLogin(merchant._id);
             return {

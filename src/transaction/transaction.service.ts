@@ -14,18 +14,19 @@ export class TransactionService {
     private readonly merchantService: MerchantService,
   ) {}
 
-  async create(transDto: Partial<CreateTransactionDto>): Promise<Transaction> {
+  async create(createTransactionDto: Partial<CreateTransactionDto>): Promise<Transaction> {
     const createdTransaction = new this.transactionModel({
-      ...transDto,
+      ...createTransactionDto,
       status: 'pending',
       transactionId: this.generateTransactionId(),
     });
 
     const savedTransaction = await createdTransaction.save();
 
-    if (transDto.referrerClientId) {
-      await this.merchantService.updateRewardPoints(transDto.referrerClientId, 5); // Example reward points for a transaction
+    if (createTransactionDto.referrerClientId) {
+      await this.merchantService.updateRewardPoints(createTransactionDto.referrerClientId, 5); // Example reward points for a transaction
     }
+
     return savedTransaction;
   }
 
@@ -49,17 +50,8 @@ export class TransactionService {
     await this.transactionModel.findOneAndDelete({ transactionId }).exec();
   }
 
-  async getTransactionHistory(userId: string, filter?: string): Promise<Transaction[]> {
-    const query = { userId };
-    if (filter) {
-      query['status'] = filter;
-    }
-    return this.transactionModel.find(query).exec();
-  }
-
   private generateTransactionId(): string {
     return 'txn_' + crypto.randomBytes(4).toString('hex'); // Generates a 8-character hex string
   }
-  
 }
 

@@ -39,10 +39,6 @@ let UserService = UserService_1 = class UserService {
             if (!validation_util_1.ValidationUtil.isValidEmail(userDto.email)) {
                 throw new Error('Invalid email address');
             }
-            const existingUser = await this.userModel.findOne({ email: userDto.email }).exec();
-            if (existingUser) {
-                throw new common_1.BadRequestException('User already registered');
-            }
             const hashedPassword = await password_util_1.PasswordUtil.hashPassword(userDto.password);
             const gravatarUrl = await this.gravatarService.fetchAvatar(userDto.email);
             const createdUser = new this.userModel({ ...userDto, password: hashedPassword });

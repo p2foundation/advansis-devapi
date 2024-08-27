@@ -3,6 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtRefreshStrategy } from './jwt-refresh.strategy';
+import { JWT_SECRET } from '../constants';
 import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
 import { EmailService } from '../utilities/email.service';
@@ -20,7 +21,7 @@ import { MerchantService } from 'src/merchant/merchant.service';
     PassportModule,
     JwtModule.register({
       global: true,
-      secret:  `${process.env.JWT_SECRET}`,
+      secret:  `${process.env.JWT_SECRET}` || `${JWT_SECRET}`,
       signOptions: { expiresIn: '60m' },
     }),
     MerchantModule

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Delete, Param, UseGuards, Logger, Request } from '@nestjs/common'; // Added Request import
+import { Controller, Get, Post, Body, Put, Delete, Param, UseGuards } from '@nestjs/common';
 import { RewardService } from './reward.service';
 import { CreateRewardDto } from './dto/create-reward.dto';
 import { UpdateRewardDto } from './dto/update-reward.dto';
@@ -9,41 +9,35 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody } from '@nes
 @ApiBearerAuth()
 @Controller('api/v1/rewards')
 export class RewardController {
-  private logger = new Logger(RewardController.name);
-
   constructor(private readonly rewardService: RewardService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post('create')
   @ApiOperation({ summary: 'Create a new reward' })
   @ApiResponse({ status: 201, description: 'The reward has been successfully created', type: CreateRewardDto })
-  @ApiResponse({ status: 400, description: 'Bad request', type: String })
-  @ApiResponse({ status: 401, description: 'Unauthorized', type: String })
-  @ApiResponse({ status: 409, description: 'Reward already exists', type: String })
   @ApiBody({
+    description: 'Reward creation details',
     schema: {
       type: 'object',
+      required: ['name', 'description', 'points'],
       properties: {
-        name: { type: 'string', example: 'Reward Name' },
-        reason: { type: 'string', example: 'Reward Description' },
-        points: { type: 'number', example: 100 },
-        expirationDate: { type: 'string', example: '2023-01-01' },
+        name: {
+          type: 'string',
+          description: 'The name of the reward',
+        },
+        description: {
+          type: 'string',
+          description: 'A brief description of the reward',
+        },
+        points: {
+          type: 'integer',
+          description: 'The number of points required to redeem the reward',
+        },
+        // Add other properties as needed
       },
-      required: ['name', 'reason', 'points',],
     },
   })
-  async create(
-    @Body() createRewardDto: CreateRewardDto, 
-    @Request() req
-  ) {
-    this.logger.log(`RewardDto ==> ${JSON.stringify(createRewardDto)}`);
-    console.debug('req.user +++ ',req.user);
-
-    // Check if req.user.id is defined
-    if (!req.user || !req.user.sub) {
-      throw new Error('User ID is not available in the request');
-    }
-    createRewardDto.userId = req.user.sub;
+  @Post()
+  async create(@Body() createRewardDto: CreateRewardDto) {
     return this.rewardService.create(createRewardDto);
   }
 
@@ -67,10 +61,7 @@ export class RewardController {
   @ApiOperation({ summary: 'Update a reward' })
   @ApiResponse({ status: 200, description: 'The reward has been successfully updated', type: UpdateRewardDto })
   @Put(':userId')
-  async update(
-    @Param('userId') userId: string,
-    @Body() updateRewardDto: UpdateRewardDto
-  ) {
+  async update(@Param('userId') userId: string, @Body() updateRewardDto: UpdateRewardDto) {
     return this.rewardService.update(userId, updateRewardDto);
   }
 

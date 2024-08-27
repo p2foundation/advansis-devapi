@@ -1,5 +1,5 @@
 import { sign, verify } from 'jsonwebtoken';
-import { JWT_SECRET } from 'src/constants';
+import { JWT_SECRET } from '../constants';
 
 const secretKey = process.env.JWT_SECRET || JWT_SECRET;
 
@@ -22,11 +22,10 @@ export class TokenUtil {
   static verifyToken(token: string): any {
     console.debug(`TokenUtil, VerifyToken input: ${JSON.stringify(token)}`);
     try {
-      return verify(token, secretKey);
+      return verify(token, JWT_SECRET);
     } catch (error) {
       console.error(`Error verifying token: ${error.message}`);
       throw new Error(`Invalid token: ${error.message}`);
     }
   }
-  
 }
