@@ -14,7 +14,6 @@ import { SmsService } from './utilities/sms.util';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationModule } from './notification/notification.module';
-import { ReloadlyModule } from './reloadly/reloadly.module';
 import { PrymoModule } from './prymo/prymo.module';
 import configuration from './configs/configuration';
 import { AirtimeModule } from './one4all/airtime/airtime.module';
@@ -22,6 +21,9 @@ import { InternetModule } from './one4all/internet/internet.module';
 import { PsmobilemoneyModule } from './payswitch/psmobilemoney/psmobilemoney.module';
 import { PscardpaymentModule } from './payswitch/pscardpayment/pscardpayment.module';
 import { SmsModule } from './one4all/sms/sms.module';
+import { ReloadlyModule } from './reloadly/reloadly.module';
+import { AuthenticationModule } from './reloadly/authentication/authentication.module';
+import { ReloadAirtimeModule } from './reloadly/reload-airtime/reload-airtime.module';
 
 @Module({
   imports: [
@@ -37,13 +39,15 @@ import { SmsModule } from './one4all/sms/sms.module';
     TransactionModule,
     HttpModule,
     NotificationModule,
-    ReloadlyModule,
     PrymoModule,
     AirtimeModule,
     InternetModule,
     PsmobilemoneyModule,
     PscardpaymentModule,
-    SmsModule
+    SmsModule,
+    ReloadlyModule,
+    AuthenticationModule,
+    ReloadAirtimeModule
   ],
   controllers: [AppController],
   providers: [

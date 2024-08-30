@@ -11,51 +11,167 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var ReloadlyController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReloadlyController = void 0;
 const common_1 = require("@nestjs/common");
 const reloadly_service_1 = require("./reloadly.service");
-const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
-const merchant_auth_guard_1 = require("../auth/merchant-auth.guard");
-const swagger_1 = require("@nestjs/swagger");
-const country_reloadly_dto_1 = require("./dto/country-reloadly.dto");
-let ReloadlyController = class ReloadlyController {
+const reloadly_dto_1 = require("./dto/reloadly.dto");
+const network_operators_dto_1 = require("./dto/network.operators.dto");
+let ReloadlyController = ReloadlyController_1 = class ReloadlyController {
     constructor(reloadlyService) {
         this.reloadlyService = reloadlyService;
+        this.logger = new common_1.Logger(ReloadlyController_1.name);
     }
-    async topUp(reloadlyDto) {
-        return this.reloadlyService.topUp(reloadlyDto);
+    async getAccountBalance() {
+        try {
+            const gab = await this.reloadlyService.accountBalance();
+            return gab;
+        }
+        catch (error) {
+            this.logger.error(`Error getting account balance: ${error}`);
+        }
     }
-    async getOperatorsByCountry(countryCode) {
-        return this.reloadlyService.getOperatorsByCountry(countryCode);
+    async getAccessToken() {
+        try {
+            const gatRes = await this.reloadlyService.accessToken();
+            this.logger.debug(`reloadly access token ===>  ${gatRes}`);
+            return gatRes;
+        }
+        catch (error) {
+            this.logger.error(`Error getting access token: ${error}`);
+        }
+    }
+    async listCountryList() {
+        try {
+            const lcl = this.reloadlyService.countryList();
+            this.logger.log(`${JSON.stringify(lcl)}`);
+            return lcl;
+        }
+        catch (error) {
+            this.logger.error(`Error listing countries: ${error}`);
+        }
+    }
+    async findCountryByCode(fcbDto) {
+        if (!fcbDto) {
+            throw new Error('Invalid input data');
+        }
+        try {
+            const fcb = await this.reloadlyService.findCountryByCode(fcbDto);
+            return fcb;
+        }
+        catch (error) {
+            this.logger.error(`Error finding country by code: ${error}`);
+        }
+    }
+    async getNetworkGenerator(gngDto) {
+        if (!gngDto) {
+            throw new Error('Invalid input data');
+        }
+        try {
+            const gng = await this.reloadlyService.networkOperators(gngDto);
+            return gng;
+        }
+        catch (error) {
+            this.logger.error(`Error getting network generator: ${error}`);
+        }
+    }
+    async findOperatorById(adoDto) {
+        if (!adoDto) {
+            throw new Error('Invalid input data');
+        }
+        try {
+            const ado = this.reloadlyService.findOperatorById(adoDto);
+            return ado;
+        }
+        catch (error) {
+            this.logger.error(`Error finding operator by id: ${error}`);
+        }
+    }
+    async autoDetectOperator(adoDto) {
+        if (!adoDto) {
+            throw new Error('Invalid input data');
+        }
+        try {
+            const accessToken = await this.getAccessToken();
+            this.logger.debug(`access token <:::> ${JSON.stringify(accessToken)}`);
+            const ado = await this.reloadlyService.autoDetectOperator(adoDto);
+            this.logger.debug(`network autodetect input ==>${JSON.stringify(adoDto)}`);
+            return ado;
+        }
+        catch (error) {
+            this.logger.error(`Error auto detecting operator: ${error}`);
+        }
+    }
+    async getNetworkOperatorByCode(gnobcDto) {
+        if (!gnobcDto) {
+            throw new Error('Invalid input data');
+        }
+        try {
+            const gnobc = await this.reloadlyService.getOperatorByCode(gnobcDto);
+            return gnobc;
+        }
+        catch (error) {
+            this.logger.error(`Error getting network operator by code: ${error}`);
+        }
     }
 };
 exports.ReloadlyController = ReloadlyController;
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Top-up a phone number' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Top-up successful', type: Object }),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, merchant_auth_guard_1.MerchantAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.Post)('topup'),
+    (0, common_1.Get)('/account-balance'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ReloadlyController.prototype, "getAccountBalance", null);
+__decorate([
+    (0, common_1.Get)('/auth/access-token'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ReloadlyController.prototype, "getAccessToken", null);
+__decorate([
+    (0, common_1.Get)('/countries'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ReloadlyController.prototype, "listCountryList", null);
+__decorate([
+    (0, common_1.Post)('country/code'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [country_reloadly_dto_1.CountryReloadlyDto]),
+    __metadata("design:paramtypes", [reloadly_dto_1.ReloadlyDto]),
     __metadata("design:returntype", Promise)
-], ReloadlyController.prototype, "topUp", null);
+], ReloadlyController.prototype, "findCountryByCode", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Get operators by country code' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Operators list', type: [Object] }),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, merchant_auth_guard_1.MerchantAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.Get)('operators'),
-    __param(0, (0, common_1.Query)('countryCode')),
+    (0, common_1.Post)('operators'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [network_operators_dto_1.NetworkOperatorsDto]),
     __metadata("design:returntype", Promise)
-], ReloadlyController.prototype, "getOperatorsByCountry", null);
-exports.ReloadlyController = ReloadlyController = __decorate([
-    (0, swagger_1.ApiTags)('reloadly'),
-    (0, common_1.Controller)('api/v1/reloadly'),
+], ReloadlyController.prototype, "getNetworkGenerator", null);
+__decorate([
+    (0, common_1.Post)('/operator/id'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [network_operators_dto_1.NetworkOperatorsDto]),
+    __metadata("design:returntype", Promise)
+], ReloadlyController.prototype, "findOperatorById", null);
+__decorate([
+    (0, common_1.Post)('/operator/autodetect'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [network_operators_dto_1.NetworkOperatorsDto]),
+    __metadata("design:returntype", Promise)
+], ReloadlyController.prototype, "autoDetectOperator", null);
+__decorate([
+    (0, common_1.Post)('/operator/country-code'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [network_operators_dto_1.NetworkOperatorsDto]),
+    __metadata("design:returntype", Promise)
+], ReloadlyController.prototype, "getNetworkOperatorByCode", null);
+exports.ReloadlyController = ReloadlyController = ReloadlyController_1 = __decorate([
+    (0, common_1.Controller)('api/reloadly'),
     __metadata("design:paramtypes", [reloadly_service_1.ReloadlyService])
 ], ReloadlyController);
 //# sourceMappingURL=reloadly.controller.js.map

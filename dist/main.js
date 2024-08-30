@@ -22,17 +22,24 @@ async function bootstrap() {
         .setDescription(description)
         .setVersion('1.0')
         .addTag('lidapay')
+        .addBearerAuth()
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
-    swagger_1.SwaggerModule.setup('api-doc', app, document);
-    const port = process.env.PORT || constants_1.SERVER_PORT;
+    swagger_1.SwaggerModule.setup('api-doc', app, document, {
+        swaggerOptions: {
+            persistAuthorization: true,
+        },
+        customfavIcon: 'https://example.com/favicon.ico',
+        customSiteTitle: 'Lidapay API Documentation',
+    });
+    const port = parseInt(process.env.PORT, 10) || constants_1.SERVER_PORT;
     try {
         await app.listen(port);
         logger.debug(`Lidapay app is running on: ${await app.getUrl()}`);
     }
     catch (error) {
         logger.error(`Error starting Lidapay app: ${error.message}`);
-        process.exit(1);
+        throw error;
     }
 }
 bootstrap();

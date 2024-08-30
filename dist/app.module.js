@@ -23,7 +23,6 @@ const sms_util_1 = require("./utilities/sms.util");
 const axios_1 = require("@nestjs/axios");
 const config_1 = require("@nestjs/config");
 const notification_module_1 = require("./notification/notification.module");
-const reloadly_module_1 = require("./reloadly/reloadly.module");
 const prymo_module_1 = require("./prymo/prymo.module");
 const configuration_1 = require("./configs/configuration");
 const airtime_module_1 = require("./one4all/airtime/airtime.module");
@@ -31,6 +30,9 @@ const internet_module_1 = require("./one4all/internet/internet.module");
 const psmobilemoney_module_1 = require("./payswitch/psmobilemoney/psmobilemoney.module");
 const pscardpayment_module_1 = require("./payswitch/pscardpayment/pscardpayment.module");
 const sms_module_1 = require("./one4all/sms/sms.module");
+const reloadly_module_1 = require("./reloadly/reloadly.module");
+const authentication_module_1 = require("./reloadly/authentication/authentication.module");
+const reload_airtime_module_1 = require("./reloadly/reload-airtime/reload-airtime.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -49,13 +51,15 @@ exports.AppModule = AppModule = __decorate([
             transaction_module_1.TransactionModule,
             axios_1.HttpModule,
             notification_module_1.NotificationModule,
-            reloadly_module_1.ReloadlyModule,
             prymo_module_1.PrymoModule,
             airtime_module_1.AirtimeModule,
             internet_module_1.InternetModule,
             psmobilemoney_module_1.PsmobilemoneyModule,
             pscardpayment_module_1.PscardpaymentModule,
-            sms_module_1.SmsModule
+            sms_module_1.SmsModule,
+            reloadly_module_1.ReloadlyModule,
+            authentication_module_1.AuthenticationModule,
+            reload_airtime_module_1.ReloadAirtimeModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [

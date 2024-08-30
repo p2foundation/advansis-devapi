@@ -89,7 +89,25 @@ exports.UserController = UserController;
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'The record has been successfully created', type: create_user_dto_1.CreateUserDto }),
-    (0, swagger_1.ApiBody)({ type: create_user_dto_1.CreateUserDto }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                username: { type: 'string' },
+                firstName: { type: 'string' },
+                lastName: { type: 'string' },
+                password: { type: 'string' },
+                roles: {
+                    type: 'array',
+                    items: { type: 'string' }
+                }, email: {
+                    type: 'string'
+                },
+                phoneNumber: { type: 'string' },
+                referrerClientId: { type: 'string', description: 'Optional Merchant ClientID' }
+            }
+        }
+    }),
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -97,20 +115,37 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "register", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Login a user' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'User logged in successfully', type: create_user_dto_1.CreateUserDto }),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('local')),
     (0, common_1.Post)('login'),
+    (0, swagger_1.ApiOperation)({ summary: 'Login a user' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User logged in successfully', type: create_user_dto_1.CreateUserDto }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                username: { type: 'string' },
+                password: { type: 'string' }
+            },
+        },
+    }),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "login", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Refresh user token' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Token refreshed successfully', type: create_user_dto_1.CreateUserDto }),
     (0, common_1.UseGuards)(jwt_refresh_guard_1.JwtRefreshGuard),
     (0, common_1.Post)('refresh'),
+    (0, swagger_1.ApiOperation)({ summary: 'Refresh user token' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Token refreshed successfully', type: create_user_dto_1.CreateUserDto }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                refreshToken: { type: 'string', description: 'Login token' }
+            },
+        },
+    }),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -127,11 +162,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "genRefreshToken", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Get user points' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'User points retrieved', type: Number }),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Get)('points'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get user points' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User points retrieved', type: Number }),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -197,14 +232,24 @@ __decorate([
     (0, common_1.Post)('merchant/login'),
     (0, swagger_1.ApiOperation)({ summary: 'Merchant login' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Merchant logged in successfully', type: create_user_dto_1.CreateUserDto }),
-    (0, swagger_1.ApiBody)({}),
+    (0, swagger_1.ApiBody)({
+        description: 'Merchant login credentials',
+        required: true,
+        schema: {
+            type: 'object',
+            properties: {
+                clientId: { type: 'string' },
+                clientSecret: { type: 'string' },
+            },
+        }
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "merchantLogin", null);
 exports.UserController = UserController = UserController_1 = __decorate([
-    (0, swagger_1.ApiTags)('users'),
+    (0, swagger_1.ApiTags)('Users'),
     (0, common_1.Controller)('api/v1/users'),
     __metadata("design:paramtypes", [user_service_1.UserService,
         auth_service_1.AuthService])
