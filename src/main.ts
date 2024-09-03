@@ -14,8 +14,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const description = `
-    A secure and scalable API designed to power the Lidapay ecosystem, 
-    providing a seamless experience for users across various platforms.
+    A secure and scalable API designed to power the Lidapay ecosystem, providing a seamless experience for users across various platforms.
     Powered by Advansis Technologies.
   `;
 

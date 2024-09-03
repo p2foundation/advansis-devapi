@@ -14,7 +14,7 @@ export class ReloadlyController {
   @Get('/account-balance')
   async getAccountBalance(): Promise<any> {
     try {
-      const gab = await this.reloadlyService.accountBalance();
+      const gab = this.reloadlyService.getAccountBalance();
       return gab;
     } catch (error) {
       this.logger.error(`Error getting account balance: ${error}`);

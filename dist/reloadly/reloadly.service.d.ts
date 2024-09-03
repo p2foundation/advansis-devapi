@@ -9,8 +9,8 @@ export declare class ReloadlyService {
     private reloadLyBaseURL;
     private authURL;
     constructor(httpService: HttpService);
-    accessToken(): Observable<any>;
-    accountBalance(): Observable<AxiosResponse<any>>;
+    accessToken(): Promise<Observable<any>>;
+    getAccountBalance(): Promise<Observable<any>>;
     countryList(): Observable<AxiosResponse<any>>;
     findCountryByCode(reloadDto: ReloadlyDto): Observable<AxiosResponse<ReloadlyDto>>;
     networkOperators(netDto: NetworkOperatorsDto): Observable<AxiosResponse<NetworkOperatorsDto>>;
@@ -18,4 +18,5 @@ export declare class ReloadlyService {
     autoDetectOperator(adoDto: NetworkOperatorsDto): Observable<AxiosResponse<NetworkOperatorsDto>>;
     getOperatorByCode(gobcDto: NetworkOperatorsDto): Observable<AxiosResponse<NetworkOperatorsDto>>;
     fxRates(): Promise<any>;
+    private reloadlyAccessToken;
 }

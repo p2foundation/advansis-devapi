@@ -12,7 +12,7 @@ import { HttpService } from "@nestjs/axios";
 import { catchError, map } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { ReloadlyDto } from "./dto/reloadly.dto";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { NetworkOperatorsDto } from "./dto/network.operators.dto";
 
 @Injectable()
@@ -26,7 +26,7 @@ export class ReloadlyService {
   ) {
   }
 
-  accessToken(): Observable<any> {
+  async accessToken(): Promise<Observable<any>> {
     this.logger.verbose(`ACCESS TOKEN LOADING ...`);
     // token payload
     const gatPayload = {
@@ -62,41 +62,28 @@ export class ReloadlyService {
         })
       );
   }
-  // Get Reloadly Account Balance
-  accountBalance(): Observable<AxiosResponse<any>> {
-    const token = RELOADLY_TOKEN_SANDBOX;
-    this.logger.log(`retrieve access token ===> ${JSON.stringify(token)}`);
-    // const abURL = this.reloadlyBaseURL + `/accounts/balance`;
-    const abURL = this.reloadLyBaseURL + `/accounts/balance`;
+  /**
+   * Get Reloadly account balance
+   *
+   * @returns {Promise<Observable<AxiosResponse<any>>>}
+   * @memberof ReloadlyService
+   */
+  async getAccountBalance(): Promise<Observable<any>> {
+    const url = `${this.reloadLyBaseURL}/accounts/balance`;
 
-    const config = {
-      url: abURL,
-      headers: {
-        Accept: "application/com.reloadly.topups-v1+json",
-        Authorization: `Bearer ${token}`
-      }
+    const token = await this.reloadlyAccessToken();
+    const headers = {
+      Accept: 'application/com.reloadly.topups-v1+json',
+      Authorization: `Bearer ${token}`,
     };
 
-    return this.httpService
-      .get(config.url, { headers: config.headers })
-      .pipe(
-        map((abRes) => {
-          this.logger.debug(`RELOADLY ACCOUNT BALANCE = ${JSON.stringify(
-            abRes.data
-          )}`
-          );
-          return abRes.data;
-        }),
-        catchError((abError) => {
-          this.logger.error(`ERROR RELOADLY ACCOUNT BALANCE = ${JSON.stringify(
-            abError.response.data
-          )}`
-          );
-          const abErrorMessage = abError.response.data;
-          throw new NotFoundException(abErrorMessage);
-        })
-      );
-
+    return this.httpService.get<any>(url, { headers }).pipe(
+      map((res: AxiosResponse<any>) => res.data),
+      catchError((err: AxiosError) => {
+        const errorMessage = err.response?.data;
+        throw new NotFoundException(errorMessage);
+      }),
+    );
   }
 
   countryList(): Observable<AxiosResponse<any>> {
@@ -172,7 +159,7 @@ export class ReloadlyService {
   networkOperators(netDto: NetworkOperatorsDto): Observable<AxiosResponse<NetworkOperatorsDto>> {
 
     const accessToken: any = RELOADLY_TOKEN_SANDBOX;
-    // const accessToken = "eyJraWQiOiI1N2JjZjNhNy01YmYwLTQ1M2QtODQ0Mi03ODhlMTA4OWI3MDIiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMzAyOSIsImlzcyI6Imh0dHBzOi8vcmVsb2FkbHktc2FuZGJveC5hdXRoMC5jb20vIiwiaHR0cHM6Ly9yZWxvYWRseS5jb20vc2FuZGJveCI6dHJ1ZSwiaHR0cHM6Ly9yZWxvYWRseS5jb20vcHJlcGFpZFVzZXJJZCI6IjIzMDI5IiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwiYXVkIjoiaHR0cHM6Ly90b3B1cHMtaHMyNTYtc2FuZGJveC5yZWxvYWRseS5jb20iLCJuYmYiOjE3MTY3OTk2MTMsImF6cCI6IjIzMDI5Iiwic2NvcGUiOiJzZW5kLXRvcHVwcyByZWFkLW9wZXJhdG9ycyByZWFkLXByb21vdGlvbnMgcmVhZC10b3B1cHMtaGlzdG9yeSByZWFkLXByZXBhaWQtYmFsYW5jZSByZWFkLXByZXBhaWQtY29tbWlzc2lvbnMiLCJleHAiOjE3MTY4ODYwMTMsImh0dHBzOi8vcmVsb2FkbHkuY29tL2p0aSI6IjI3YjIyMDJiLTRiOTctNDkzOS1iYTQ0LTgzNWIwMTNhOGYyYSIsImlhdCI6MTcxNjc5OTYxMywianRpIjoiNGE0NTU3MTMtZTg1ZS00YmY2LTk5MjQtOWEwZTY0NzhiZTgwIn0.ymHCUMNePx_w2xmOEBodg9eO1PnCXClLqLzuZJlmnwM";
+    // const accessToken = "eyJraWQiOiI1N2JjZjNhNy01YmYwLTQ1M2QtODQ0Mi03ODhlMTA4OWI3MDIiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMzAyOSIsImlzcyI6Imh0dHBzOi8vcmVsb2FkbHktc2FuZGJveC5hdXRoMC5jb20vIiwiaHR0cHM6Ly9yZWxvYWRseS5jb20vc2FuZGJveCI6dHJ1ZSwiaHR0cHM6Ly9yZWxvYWRseS5jb20vcHJlcGFpZFVzZXJJZCI6IjIzMDI5IiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwiYXVkIjoiaHR0cHM6Ly90b3B1cHMtaHMyNTYtc2FuZGJveC5yZWxvYWRseS5jb20iLCJuYmYiOjE3MTY3OTk2MTMsImF6cCI6IjIzMDI5Iiwic2NvcGUiOiJzZW5kLXRvcHVwcyByZWFkLW9wZXJhdG9ycyByZWFkLXByb21vdGlvbnMgcmVhZC10b3B1cHMtaGlzdG9yeSByZWFkLXByZXBhaWQtYmFsYW5jZSByZWFkLXByZXBhaWQtY29tbWlzc2lvbnMiLCJleHAiOjE3MTY4ODYwMTMsImh0dHBzOi8vcmVsb2FkbHkuY29tL2p0aSI6ImRkZjExNzAyLTQ1MTktNDlhYy1iOTc5LWU4YzhkYTRmZWUxZCIsImlhdCI6MTcxNjc5OTYxMywianRpIjoiNGE0NTU3MTMtZTg1ZS00YmY2LTk5MjQtOWEwZTY0NzhiZTgwIn0.ymHCUMNePx_w2xmOEBodg9eO1PnCXClLqLzuZJlmnwM";
     console.debug(`network operators ==> ${JSON.stringify(accessToken)}`);
 
     const {
@@ -356,6 +343,27 @@ export class ReloadlyService {
   }
 
   async fxRates(): Promise<any> {
+  }
+
+  private async reloadlyAccessToken(): Promise<any> {
+    const tokenPayload = {
+      client_id: RELOADLY_CLIENT_ID_SANDBOX,
+      client_secret: RELOADLY_CLIENT_SECRET_SANDBOX,
+      grant_type: RELOADLY_GRANT_TYPE_SANDBOX,
+      audience: RELOADLY_AUDIENCE_SANDBOX,
+    };
+
+    const tokenUrl = `${this.authURL}/oauth/token`;
+
+    try {
+      const response = await this.httpService.post(tokenUrl, tokenPayload).toPromise();
+      const accessToken = response.data.access_token;
+      // this.logger.debug(`Access token generated: ${accessToken}`);
+      return accessToken;
+    } catch (error) {
+      this.logger.error(`Error generating access token: ${error.message}`);
+      throw new NotFoundException('Failed to generate access token');
+    }
   }
 
 }

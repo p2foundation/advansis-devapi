@@ -13,8 +13,7 @@ async function bootstrap() {
     app.use((0, helmet_1.default)());
     app.useGlobalPipes(new common_1.ValidationPipe());
     const description = `
-    A secure and scalable API designed to power the Lidapay ecosystem, 
-    providing a seamless experience for users across various platforms.
+    A secure and scalable API designed to power the Lidapay ecosystem, providing a seamless experience for users across various platforms.
     Powered by Advansis Technologies.
   `;
     const config = new swagger_1.DocumentBuilder()

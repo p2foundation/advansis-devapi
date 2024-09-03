@@ -15,7 +15,7 @@ import { AuthenticationDto } from "./dto/authentication.dto";
 @Injectable()
 export class AuthenticationService {
   private logger = new Logger(AuthenticationService.name);
-  private reloadLyBaseURL = RELOADLY_BASEURL;
+  private reloadLyBaseURL = process.env.RELOADLY_BASEURL || RELOADLY_BASEURL;
 
   constructor(
     private httpService: HttpService
@@ -27,41 +27,26 @@ export class AuthenticationService {
   ): Observable<AxiosResponse<AuthenticationDto>> {
     const { grantType, audience } = authDto;
 
-    const authPayload = {
-      client_id: RELOADLY_CLIENT_ID_SANDBOX,
-      client_secret: RELOADLY_CLIENT_SECRET_SANDBOX ,
-      grant_type: RELOADLY_GRANT_TYPE_SANDBOX || grantType,
-      audience: RELOADLY_AUDIENCE_SANDBOX  || audience
+    const authConfig = {
+      clientId: process.env.RELOADLY_CLIENT_ID_SANDBOX || RELOADLY_CLIENT_ID_SANDBOX,
+      clientSecret: process.env.RELOADLY_CLIENT_SECRET_SANDBOX || RELOADLY_CLIENT_SECRET_SANDBOX,
+      grantType: process.env.RELOADLY_GRANT_TYPE_SANDBOX || RELOADLY_GRANT_TYPE_SANDBOX || grantType,
+      audience: process.env.RELOADLY_AUDIENCE_SANDBOX || RELOADLY_AUDIENCE_SANDBOX || audience,
     };
 
-    const authURL = this.reloadLyBaseURL + `/oauth/token`;
-
-    const configs = {
-      url: authURL,
-      body: authPayload,
-      agent: new https.Agent({
-        rejectUnauthorized: false,
-      })
+    const requestConfig = {
+      url: `${this.reloadLyBaseURL}/oauth/token`,
+      body: authConfig,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     };
-    this.logger.log(`access token configs == ${JSON.stringify(configs)}`);
 
     return this.httpService
-      .post(configs.url, configs.body)
+      .post(requestConfig.url, requestConfig.body, { httpsAgent: requestConfig.httpsAgent })
       .pipe(
-        map((authRes) => {
-          this.logger.log(
-            `ACCESS TOKEN response ++++ ${JSON.stringify(authRes.data)}`,
-          );
-          return authRes.data;
-        }),
-        catchError((authError) => {
-          this.logger.error(
-            `ACCESS TOKEN ERROR response ---- ${JSON.stringify(
-              authError.response.data,
-            )}`,
-          );
-          const authErrorMessage = authError.response.data;
-          throw new NotFoundException(authErrorMessage);
+        map((response) => response.data),
+        catchError((error) => {
+          const errorMessage = error.response.data;
+          throw new NotFoundException(errorMessage);
         }),
       );
   }

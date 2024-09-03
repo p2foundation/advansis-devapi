@@ -17,6 +17,7 @@ exports.AuthenticationController = void 0;
 const common_1 = require("@nestjs/common");
 const authentication_service_1 = require("./authentication.service");
 const authentication_dto_1 = require("./dto/authentication.dto");
+const swagger_1 = require("@nestjs/swagger");
 let AuthenticationController = AuthenticationController_1 = class AuthenticationController {
     constructor(authService) {
         this.authService = authService;
@@ -31,13 +32,21 @@ let AuthenticationController = AuthenticationController_1 = class Authentication
 exports.AuthenticationController = AuthenticationController;
 __decorate([
     (0, common_1.Post)('/access-token'),
+    (0, swagger_1.ApiBody)({ type: authentication_dto_1.AuthenticationDto }),
+    (0, swagger_1.ApiOperation)({ summary: 'Generate a Reloadly access token' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The generated access token',
+        type: String,
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [authentication_dto_1.AuthenticationDto]),
     __metadata("design:returntype", Promise)
 ], AuthenticationController.prototype, "genAuthentication", null);
 exports.AuthenticationController = AuthenticationController = AuthenticationController_1 = __decorate([
-    (0, common_1.Controller)('api/auth'),
+    (0, swagger_1.ApiTags)('Reloadly Authentication'),
+    (0, common_1.Controller)('api/v1/auth'),
     __metadata("design:paramtypes", [authentication_service_1.AuthenticationService])
 ], AuthenticationController);
 //# sourceMappingURL=authentication.controller.js.map

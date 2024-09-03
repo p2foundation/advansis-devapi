@@ -20,34 +20,26 @@ let AuthenticationService = AuthenticationService_1 = class AuthenticationServic
     constructor(httpService) {
         this.httpService = httpService;
         this.logger = new common_1.Logger(AuthenticationService_1.name);
-        this.reloadLyBaseURL = constants_1.RELOADLY_BASEURL;
+        this.reloadLyBaseURL = process.env.RELOADLY_BASEURL || constants_1.RELOADLY_BASEURL;
     }
     genAccessToken(authDto) {
         const { grantType, audience } = authDto;
-        const authPayload = {
-            client_id: constants_1.RELOADLY_CLIENT_ID_SANDBOX,
-            client_secret: constants_1.RELOADLY_CLIENT_SECRET_SANDBOX,
-            grant_type: constants_1.RELOADLY_GRANT_TYPE_SANDBOX || grantType,
-            audience: constants_1.RELOADLY_AUDIENCE_SANDBOX || audience
+        const authConfig = {
+            clientId: process.env.RELOADLY_CLIENT_ID_SANDBOX || constants_1.RELOADLY_CLIENT_ID_SANDBOX,
+            clientSecret: process.env.RELOADLY_CLIENT_SECRET_SANDBOX || constants_1.RELOADLY_CLIENT_SECRET_SANDBOX,
+            grantType: process.env.RELOADLY_GRANT_TYPE_SANDBOX || constants_1.RELOADLY_GRANT_TYPE_SANDBOX || grantType,
+            audience: process.env.RELOADLY_AUDIENCE_SANDBOX || constants_1.RELOADLY_AUDIENCE_SANDBOX || audience,
         };
-        const authURL = this.reloadLyBaseURL + `/oauth/token`;
-        const configs = {
-            url: authURL,
-            body: authPayload,
-            agent: new https.Agent({
-                rejectUnauthorized: false,
-            })
+        const requestConfig = {
+            url: `${this.reloadLyBaseURL}/oauth/token`,
+            body: authConfig,
+            httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         };
-        this.logger.log(`access token configs == ${JSON.stringify(configs)}`);
         return this.httpService
-            .post(configs.url, configs.body)
-            .pipe((0, operators_1.map)((authRes) => {
-            this.logger.log(`ACCESS TOKEN response ++++ ${JSON.stringify(authRes.data)}`);
-            return authRes.data;
-        }), (0, operators_1.catchError)((authError) => {
-            this.logger.error(`ACCESS TOKEN ERROR response ---- ${JSON.stringify(authError.response.data)}`);
-            const authErrorMessage = authError.response.data;
-            throw new common_1.NotFoundException(authErrorMessage);
+            .post(requestConfig.url, requestConfig.body, { httpsAgent: requestConfig.httpsAgent })
+            .pipe((0, operators_1.map)((response) => response.data), (0, operators_1.catchError)((error) => {
+            const errorMessage = error.response.data;
+            throw new common_1.NotFoundException(errorMessage);
         }));
     }
 };

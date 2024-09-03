@@ -22,7 +22,7 @@ let ReloadlyService = ReloadlyService_1 = class ReloadlyService {
         this.reloadLyBaseURL = constants_1.RELOADLY_BASEURL_SANDBOX;
         this.authURL = constants_1.RELOADLY_BASEURL;
     }
-    accessToken() {
+    async accessToken() {
         this.logger.verbose(`ACCESS TOKEN LOADING ...`);
         const gatPayload = {
             client_id: constants_1.RELOADLY_CLIENT_ID_SANDBOX,
@@ -47,26 +47,16 @@ let ReloadlyService = ReloadlyService_1 = class ReloadlyService {
             throw new common_1.NotFoundException(gatErrorMessage);
         }));
     }
-    accountBalance() {
-        const token = constants_1.RELOADLY_TOKEN_SANDBOX;
-        this.logger.log(`retrieve access token ===> ${JSON.stringify(token)}`);
-        const abURL = this.reloadLyBaseURL + `/accounts/balance`;
-        const config = {
-            url: abURL,
-            headers: {
-                Accept: "application/com.reloadly.topups-v1+json",
-                Authorization: `Bearer ${token}`
-            }
+    async getAccountBalance() {
+        const url = `${this.reloadLyBaseURL}/accounts/balance`;
+        const token = await this.reloadlyAccessToken();
+        const headers = {
+            Accept: 'application/com.reloadly.topups-v1+json',
+            Authorization: `Bearer ${token}`,
         };
-        return this.httpService
-            .get(config.url, { headers: config.headers })
-            .pipe((0, operators_1.map)((abRes) => {
-            this.logger.debug(`RELOADLY ACCOUNT BALANCE = ${JSON.stringify(abRes.data)}`);
-            return abRes.data;
-        }), (0, operators_1.catchError)((abError) => {
-            this.logger.error(`ERROR RELOADLY ACCOUNT BALANCE = ${JSON.stringify(abError.response.data)}`);
-            const abErrorMessage = abError.response.data;
-            throw new common_1.NotFoundException(abErrorMessage);
+        return this.httpService.get(url, { headers }).pipe((0, operators_1.map)((res) => res.data), (0, operators_1.catchError)((err) => {
+            const errorMessage = err.response?.data;
+            throw new common_1.NotFoundException(errorMessage);
         }));
     }
     countryList() {
@@ -246,6 +236,24 @@ let ReloadlyService = ReloadlyService_1 = class ReloadlyService {
         }));
     }
     async fxRates() {
+    }
+    async reloadlyAccessToken() {
+        const tokenPayload = {
+            client_id: constants_1.RELOADLY_CLIENT_ID_SANDBOX,
+            client_secret: constants_1.RELOADLY_CLIENT_SECRET_SANDBOX,
+            grant_type: constants_1.RELOADLY_GRANT_TYPE_SANDBOX,
+            audience: constants_1.RELOADLY_AUDIENCE_SANDBOX,
+        };
+        const tokenUrl = `${this.authURL}/oauth/token`;
+        try {
+            const response = await this.httpService.post(tokenUrl, tokenPayload).toPromise();
+            const accessToken = response.data.access_token;
+            return accessToken;
+        }
+        catch (error) {
+            this.logger.error(`Error generating access token: ${error.message}`);
+            throw new common_1.NotFoundException('Failed to generate access token');
+        }
     }
 };
 exports.ReloadlyService = ReloadlyService;

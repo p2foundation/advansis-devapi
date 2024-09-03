@@ -25,7 +25,7 @@ let ReloadlyController = ReloadlyController_1 = class ReloadlyController {
     }
     async getAccountBalance() {
         try {
-            const gab = await this.reloadlyService.accountBalance();
+            const gab = this.reloadlyService.getAccountBalance();
             return gab;
         }
         catch (error) {
