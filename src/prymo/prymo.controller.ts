@@ -6,7 +6,7 @@ import { MerchantAuthGuard } from 'src/auth/merchant-auth.guard';
 
 @ApiTags('Prymo')
 @ApiBearerAuth()
-@Controller('prymo')
+@Controller('api/v1/prymo')
 export class PrymoController {
   constructor(
     private readonly prymoService: PrymoService

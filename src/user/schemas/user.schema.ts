@@ -23,7 +23,7 @@ export class User {
   @Prop({ required: true, default: 'USER' })
   roles: string[];
   @Prop()
-  qrCode: string; // For agents
+  qrCode: string; // For agents/merchants
   @Prop()
   points: number; // Reward points
   @Prop({ required: true, default: 'ACTIVE'})

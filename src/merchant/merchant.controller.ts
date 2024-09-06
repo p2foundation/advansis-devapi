@@ -7,7 +7,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Merchant } from './schemas/merchant.schema';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
-@ApiTags('merchants')
+@ApiTags('Merchants')
 @Controller('api/v1/merchants')
 export class MerchantController {
     private logger = new Logger(MerchantController.name);

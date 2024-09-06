@@ -5,7 +5,7 @@ import { UpdateRewardDto } from './dto/update-reward.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 
-@ApiTags('rewards')
+@ApiTags('Rewards')
 @ApiBearerAuth()
 @Controller('api/v1/rewards')
 export class RewardController {
@@ -72,4 +72,5 @@ export class RewardController {
   async delete(@Param('userId') userId: string) {
     return this.rewardService.delete(userId);
   }
+
 }

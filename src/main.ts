@@ -22,7 +22,7 @@ async function bootstrap() {
     .setTitle('Lidapay API')
     .setDescription(description)
     .setVersion('1.0')
-    .addTag('lidapay')
+    .addTag('Lidapay')
     .addBearerAuth()
     .build();
 
@@ -31,7 +31,7 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true,
     },
-    customfavIcon: 'https://example.com/favicon.ico',
+    customfavIcon: 'https://advansistechnologies.com/favicon.ico',
     customSiteTitle: 'Lidapay API Documentation',
   });
 

@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Put, Delete, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Delete, Param, UseGuards, Request, Logger } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags('transactions')
+@ApiTags('Transactions')
 @Controller('api/v1/transactions')
 export class TransactionController {
+  private logger = new Logger(TransactionController.name);
+
   constructor(private readonly transactionService: TransactionService) {}
 
   @UseGuards(JwtAuthGuard)
@@ -16,6 +18,7 @@ export class TransactionController {
   @ApiResponse({ status: 201, description: 'Transaction created successfully', type: CreateTransactionDto })
   @Post()
   async create(@Body() createTransactionDto: CreateTransactionDto) {
+    this.logger.log(`Creating transaction: ${JSON.stringify(createTransactionDto)}`);
     return this.transactionService.create(createTransactionDto);
   }
 
@@ -54,4 +57,5 @@ export class TransactionController {
   async delete(@Param('transactionId') transactionId: string) {
     return this.transactionService.delete(transactionId);
   }
+
 }

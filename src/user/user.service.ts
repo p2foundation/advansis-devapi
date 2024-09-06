@@ -21,7 +21,6 @@ export class UserService {
     private smsService: SmsService,
     private gravatarService: GravatarService,
     private readonly merchantService: MerchantService,
-
   ) { }
 
   async create(userDto: CreateUserDto): Promise<User> {
@@ -52,19 +51,23 @@ export class UserService {
       // Handle creation errors
       throw error;
     }
+
   }
+
   async findOneByUsername(username: string): Promise<User | undefined> {
     if (!username) {
       throw new Error('Username is required');
     }
     return this.userModel.findOne({ username }).exec();
   }
+
   async findOneById(userId: string): Promise<User | undefined> {
     if (!userId) {
       throw new Error('User ID is required');
     }
     return this.userModel.findById(userId).exec();
   }
+
   async updateProfile(userId: string, updateData: any): Promise<User> {
     if (!userId) {
       throw new Error('User ID is required');
@@ -97,6 +100,7 @@ export class UserService {
       // Handle errors
       throw error;
     }
+
   }
 
   async findAll(): Promise<{ users: User[], totalCount: number }> {
@@ -125,6 +129,7 @@ export class UserService {
       throw error;
     }
   }
+
   async deleteAllUsers(): Promise<{ message: string }> {
     try {
       await this.userModel.deleteMany({}).exec();
@@ -133,6 +138,10 @@ export class UserService {
       // Handle deletion errors
       throw error;
     }
+  }
+
+  async updatePassword(userId: string, newHashedPassword: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { password: newHashedPassword });
   }
 
   // Other user management methods...

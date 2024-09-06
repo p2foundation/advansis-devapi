@@ -3,7 +3,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { InternetDto } from './dto/internet.dto';
 import { InternetService } from './internet.service';
 
-@ApiTags('internet')
+@ApiTags('Internet')
 @Controller('api/v1/internet')
 export class InternetController {
   private logger = new Logger('InternetController');

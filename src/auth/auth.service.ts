@@ -5,6 +5,7 @@ import { TokenUtil } from '../utilities/token.util';
 import { JwtService } from '@nestjs/jwt'; // Import JwtService
 import { JWT_EXPIRE, JWT_SECRET } from 'src/constants';
 import { MerchantService } from 'src/merchant/merchant.service';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -92,6 +93,29 @@ export class AuthService {
     return null;
   }
 
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean> {
+    this.logger.log(`Changing password for user: ${userId}`);
+
+    const user = await this.userService.findOneById(userId);
+
+    if (!user) {
+      this.logger.error(`User not found for ID: ${userId}`);
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await PasswordUtil.comparePassword(currentPassword, user.password);
+
+    if (!isPasswordValid) {
+      this.logger.error(`Invalid current password for user: ${userId}`);
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    const hashedNewPassword = await PasswordUtil.hashPassword(newPassword);
+    await this.userService.updatePassword(userId, hashedNewPassword);
+
+    this.logger.log(`Password changed successfully for user: ${userId}`);
+    return true;
+  }
 
   async merchantLogin(merchant: any) {
     try {
@@ -124,6 +148,8 @@ export class AuthService {
       throw new Error('Failed to generate merchant tokens');
     }
   }
+
+  
 
 }
 

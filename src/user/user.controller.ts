@@ -36,7 +36,7 @@ export class UserController {
         },
         phoneNumber: { type: 'string' },
         referrerClientId: { type: 'string', description: 'Optional Merchant ClientID' }
-      } 
+      }
     }
   })
   @Post('register')
@@ -188,5 +188,35 @@ export class UserController {
     }
     return this.authService.merchantLogin(merchant);
   }
+
+
+  
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Put('change-password')
+  @ApiOperation({ summary: 'Change user password' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+
+  @ApiBody({
+    description: 'Password change credentials',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        currentPassword: { type: 'string', description: 'Current password of the user' },
+        newPassword: { type: 'string', description: 'New password to set' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  async changePassword(
+    @Request() req, 
+    @Body() changePasswordDto: { currentPassword: string; newPassword: string }
+  ) {
+    return this.authService.changePassword(req.user.sub, changePasswordDto.currentPassword, changePasswordDto.newPassword);
+  }
+
+
   // Other endpoints...
 }
