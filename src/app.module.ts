@@ -15,7 +15,6 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationModule } from './notification/notification.module';
 import { PrymoModule } from './prymo/prymo.module';
-import configuration from './configs/configuration';
 import { AirtimeModule } from './one4all/airtime/airtime.module';
 import { InternetModule } from './one4all/internet/internet.module';
 import { PsmobilemoneyModule } from './payswitch/psmobilemoney/psmobilemoney.module';
@@ -28,8 +27,8 @@ import { ReloadAirtimeModule } from './reloadly/reload-airtime/reload-airtime.mo
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [configuration]
-    }),    
+      isGlobal: true, // This makes ConfigModule available globally
+    }),  
     MongooseModule.forRoot(process.env.MONGODB_URI || MONGODB_URI),  
     AuthModule, 
     UserModule,

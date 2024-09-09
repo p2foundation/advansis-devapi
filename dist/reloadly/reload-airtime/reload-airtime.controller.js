@@ -60,27 +60,145 @@ __decorate([
     __metadata("design:returntype", String)
 ], ReloadAirtimeController.prototype, "testReloadLyAirtime", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Recharge airtime' }),
-    (0, swagger_1.ApiBody)({ type: reload_airtime_dto_1.ReloadAirtimeDto }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Airtime recharged successfully' }),
     (0, common_1.Post)('recharge'),
+    (0, swagger_1.ApiOperation)({ summary: 'Recharge airtime' }),
+    (0, swagger_1.ApiBody)({
+        type: reload_airtime_dto_1.ReloadAirtimeDto,
+        description: 'Airtime recharge details',
+        schema: {
+            type: 'object',
+            properties: {
+                operatorId: {
+                    type: 'number',
+                    description: 'The ID of the operator',
+                    example: 1
+                },
+                amount: {
+                    type: 'number',
+                    description: 'The amount to recharge',
+                    example: 10
+                },
+                recipientEmail: {
+                    type: 'string',
+                    format: 'email',
+                    description: 'Email of the recipient',
+                    example: 'recipient@example.com'
+                },
+                recipientNumber: {
+                    type: 'string',
+                    description: 'Phone number of the recipient',
+                    example: '1234567890'
+                },
+                senderNumber: {
+                    type: 'string',
+                    description: 'Phone number of the sender',
+                    example: '9876543210'
+                },
+                recipientCountryCode: {
+                    type: 'string',
+                    description: 'Country code of the recipient',
+                    example: 'NG'
+                },
+                senderCountryCode: {
+                    type: 'string',
+                    description: 'Country code of the sender',
+                    example: 'US'
+                }
+            },
+            required: ['operatorId', 'amount', 'recipientNumber', 'recipientCountryCode']
+        },
+        examples: {
+            validRequest: {
+                value: {
+                    operatorId: 1,
+                    amount: 10,
+                    recipientEmail: 'recipient@example.com',
+                    recipientNumber: '1234567890',
+                    senderNumber: '9876543210',
+                    recipientCountryCode: 'NG',
+                    senderCountryCode: 'US'
+                },
+                summary: 'Valid airtime recharge request'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Airtime recharged successfully' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [reload_airtime_dto_1.ReloadAirtimeDto]),
     __metadata("design:returntype", Promise)
 ], ReloadAirtimeController.prototype, "airtimeRecharge", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Recharge airtime asynchronously' }),
-    (0, swagger_1.ApiBody)({ type: reload_airtime_dto_1.ReloadAirtimeDto }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Asynchronous airtime recharge initiated' }),
     (0, common_1.Post)('/recharge-async'),
+    (0, swagger_1.ApiOperation)({ summary: 'Recharge airtime asynchronously' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Asynchronous airtime recharge initiated' }),
+    (0, swagger_1.ApiBody)({
+        type: reload_airtime_dto_1.ReloadAirtimeDto,
+        description: 'Airtime recharge details',
+        schema: {
+            type: 'object',
+            properties: {
+                operatorId: {
+                    type: 'number',
+                    description: 'The ID of the operator',
+                    example: 1
+                },
+                amount: {
+                    type: 'number',
+                    description: 'The amount to recharge',
+                    example: 10
+                },
+                recipientEmail: {
+                    type: 'string',
+                    format: 'email',
+                    description: 'Email of the recipient',
+                    example: 'recipient@example.com'
+                },
+                recipientNumber: {
+                    type: 'string',
+                    description: 'Phone number of the recipient',
+                    example: '1234567890'
+                },
+                senderNumber: {
+                    type: 'string',
+                    description: 'Phone number of the sender',
+                    example: '9876543210'
+                },
+                recipientCountryCode: {
+                    type: 'string',
+                    description: 'Country code of the recipient',
+                    example: 'NG'
+                },
+                senderCountryCode: {
+                    type: 'string',
+                    description: 'Country code of the sender',
+                    example: 'US'
+                }
+            },
+            required: ['operatorId', 'amount', 'recipientNumber', 'recipientCountryCode']
+        },
+        examples: {
+            validRequest: {
+                value: {
+                    operatorId: 1,
+                    amount: 10,
+                    recipientEmail: 'recipient@example.com',
+                    recipientNumber: '1234567890',
+                    senderNumber: '9876543210',
+                    recipientCountryCode: 'NG',
+                    senderCountryCode: 'US'
+                },
+                summary: 'Valid airtime recharge request'
+            }
+        }
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [reload_airtime_dto_1.ReloadAirtimeDto]),
     __metadata("design:returntype", Promise)
 ], ReloadAirtimeController.prototype, "asyncAirtimeRecharge", null);
 exports.ReloadAirtimeController = ReloadAirtimeController = ReloadAirtimeController_1 = __decorate([
-    (0, swagger_1.ApiTags)('Reload Airtime'),
+    (0, swagger_1.ApiTags)('Reloadly Airtime'),
     (0, common_1.Controller)('api/v1/reload-airtime'),
     __metadata("design:paramtypes", [reload_airtime_service_1.ReloadAirtimeService])
 ], ReloadAirtimeController);

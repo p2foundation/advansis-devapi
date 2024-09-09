@@ -20,8 +20,8 @@ let EmailService = class EmailService {
             port: constants_1.GMAIL_MAIL_PORT,
             secure: false,
             auth: {
-                user: constants_1.EMAIL_ADDRESS || process.env.EMAIL_ADDRESS,
-                pass: constants_1.EMAIL_PASSWORD || process.env.EMAIL_PASSWORD
+                user: process.env.EMAIL_ADDRESS || constants_1.EMAIL_ADDRESS,
+                pass: process.env.EMAIL_PASSWORD || constants_1.EMAIL_PASSWORD
             },
             tls: {
                 rejectUnauthorized: false
@@ -42,7 +42,7 @@ let EmailService = class EmailService {
         }
         catch (error) {
             console.error('Error sending email:', error);
-            throw error;
+            throw new Error('Error sending email');
         }
     }
 };

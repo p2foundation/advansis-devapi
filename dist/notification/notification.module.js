@@ -14,6 +14,8 @@ const notification_controller_1 = require("./notification.controller");
 const notification_schema_1 = require("./schemas/notification.schema");
 const email_service_1 = require("../utilities/email.service");
 const sms_util_1 = require("../utilities/sms.util");
+const jwt_1 = require("@nestjs/jwt");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let NotificationModule = class NotificationModule {
 };
 exports.NotificationModule = NotificationModule;
@@ -25,7 +27,9 @@ exports.NotificationModule = NotificationModule = __decorate([
         providers: [
             notification_service_1.NotificationService,
             email_service_1.EmailService,
-            sms_util_1.SmsService
+            sms_util_1.SmsService,
+            jwt_auth_guard_1.JwtAuthGuard,
+            jwt_1.JwtService
         ],
         controllers: [notification_controller_1.NotificationController],
     })

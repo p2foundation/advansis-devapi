@@ -29,9 +29,9 @@ let PsmobilemoneyController = PsmobilemoneyController_1 = class PsmobilemoneyCon
         return cw;
     }
     async debitWallet(transDto) {
-        console.log(`${transDto}`);
+        this.logger.debug(`Debit wallet request: ${JSON.stringify(transDto)}`);
         const dw = await this.psMobilemoneyService.mobileMoneyPayment(transDto);
-        this.logger.debug(`db money init response ===> ${JSON.stringify(dw)}`);
+        this.logger.debug(`Debit wallet response: ${JSON.stringify(dw)}`);
         return dw;
     }
 };
@@ -39,7 +39,19 @@ exports.PsmobilemoneyController = PsmobilemoneyController;
 __decorate([
     (0, common_1.Post)('transfermoney'),
     (0, swagger_1.ApiOperation)({ summary: 'Transfer mobile money' }),
-    (0, swagger_1.ApiBody)({ type: transfer_mobilemoney_dto_1.TransferMobileMoneyDto, description: 'Transfer mobile money request body' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                amount: { type: 'number', example: 100.00 },
+                recipient: { type: 'string', example: '0201234567' },
+                network: { type: 'string', example: 'MTN' },
+                description: { type: 'string', example: 'Transfer for goods' },
+                transactionId: { type: 'string', example: 'TRX123456789' }
+            },
+            required: ['amount', 'recipient', 'network', 'transactionId']
+        }
+    }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Mobile money transferred successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid request' }),
     __param(0, (0, common_1.Body)()),
@@ -50,7 +62,19 @@ __decorate([
 __decorate([
     (0, common_1.Post)('debitwallet'),
     (0, swagger_1.ApiOperation)({ summary: 'Debit mobile money' }),
-    (0, swagger_1.ApiBody)({ type: pay_mobilemoney_dto_1.PayMobileMoneyDto, description: 'Debit mobile money request body' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                amount: { type: 'number', example: 50.00 },
+                customerMsisdn: { type: 'string', example: '0201234567' },
+                network: { type: 'string', example: 'VODAFONE' },
+                description: { type: 'string', example: 'Payment for service' },
+                transactionId: { type: 'string', example: 'PAY987654321' }
+            },
+            required: ['amount', 'customerMsisdn', 'network', 'transactionId']
+        }
+    }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Mobile money debited successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid request' }),
     __param(0, (0, common_1.Body)()),

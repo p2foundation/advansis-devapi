@@ -1,7 +1,7 @@
 export declare class TopupDto {
     readonly retailer: string;
     userId: string;
-    merchantId: string;
+    merchantId?: string;
     recipientNumber: string;
     amount: number;
     charge?: string;
@@ -43,7 +43,7 @@ export declare class TopupDto {
     callbackUrl: string;
     readonly price: string;
     recipient_number: string;
-    sender: string;
+    sender?: string;
     award?: string;
     apikey: string;
     orderID: string;
@@ -53,8 +53,7 @@ export declare class TopupDto {
     destinationAddress?: string;
     criteria?: string;
     Status?: string;
-    Transactionid?: string;
-    transactionid?: string;
+    transactionId?: string;
     Message?: string;
     MerchantReference?: string;
     CallbackURL?: string;

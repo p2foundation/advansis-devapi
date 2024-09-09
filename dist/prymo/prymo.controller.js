@@ -103,7 +103,7 @@ __decorate([
 exports.PrymoController = PrymoController = __decorate([
     (0, swagger_1.ApiTags)('Prymo'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.Controller)('prymo'),
+    (0, common_1.Controller)('api/v1/prymo'),
     __metadata("design:paramtypes", [prymo_service_1.PrymoService])
 ], PrymoController);
 //# sourceMappingURL=prymo.controller.js.map

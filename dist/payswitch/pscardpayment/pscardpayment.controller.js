@@ -30,8 +30,8 @@ let PscardpaymentController = PscardpaymentController_1 = class PscardpaymentCon
         res.status(common_1.HttpStatus.OK).json(pc);
     }
     async inlineCardMobilePayments(transDto) {
-        this.logger.debug(`PAYMENT PAYLOAD => ${transDto}`);
-        const icmp = this.pscardpaymentService.inlinePayments(transDto);
+        this.logger.debug(`PAYMENT PAYLOAD => ${JSON.stringify(transDto)}`);
+        const icmp = await this.pscardpaymentService.inlinePayments(transDto);
         return icmp;
     }
 };
@@ -49,6 +49,22 @@ __decorate([
 __decorate([
     (0, common_1.Post)('inline'),
     (0, swagger_1.ApiOperation)({ summary: 'Inline Card Mobile Payments' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                amount: { type: 'number', example: 1.00 },
+                email: { type: 'string', example: 'customer@example.com' },
+                currency: { type: 'string', example: 'GHS' },
+                card_number: { type: 'string', example: '4111111111111111' },
+                card_expiry: { type: 'string', example: '05/24' },
+                card_cvv: { type: 'string', example: '123' },
+                transaction_id: { type: 'string', example: 'TX123456789' },
+                description: { type: 'string', example: 'Payment for Product XYZ' },
+            },
+            required: ['amount', 'email', 'currency', 'card_number', 'card_expiry', 'card_cvv', 'transaction_id']
+        }
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Payment response' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -56,8 +72,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PscardpaymentController.prototype, "inlineCardMobilePayments", null);
 exports.PscardpaymentController = PscardpaymentController = PscardpaymentController_1 = __decorate([
-    (0, swagger_1.ApiTags)('cardpayment'),
-    (0, common_1.Controller)('api/pscardpayment'),
+    (0, swagger_1.ApiTags)('Card Payment'),
+    (0, common_1.Controller)('api/v1/pscardpayment'),
     __metadata("design:paramtypes", [pscardpayment_service_1.PscardpaymentService])
 ], PscardpaymentController);
 //# sourceMappingURL=pscardpayment.controller.js.map

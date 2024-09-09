@@ -275,13 +275,4 @@ export class ReloadlyController {
       // Return an error response or throw an exception
     }
   }
-
-  // private async getAccessToken(): Promise<any> {
-  //   try {
-  //     const newAccess = await this.reloadlyService.accessToken();
-  //     this.logger.debug(`access token <:::> ${JSON.stringify(newAccess)}`);
-  //     return newAccess;
-  //   } catch
-
-  // }
 }

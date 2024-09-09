@@ -12,8 +12,8 @@ export class EmailService {
       port: GMAIL_MAIL_PORT,
       secure: false, // or 'STARTTLS'
       auth: {
-        user: EMAIL_ADDRESS || process.env.EMAIL_ADDRESS,
-        pass: EMAIL_PASSWORD || process.env.EMAIL_PASSWORD
+        user: process.env.EMAIL_ADDRESS || EMAIL_ADDRESS,
+        pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD
       },
       tls: {
         rejectUnauthorized: false
@@ -36,7 +36,7 @@ export class EmailService {
       return result;
     } catch (error) {
       console.error('Error sending email:', error);
-      throw error;
+      throw new Error('Error sending email');
     }
   }
 }

@@ -19,9 +19,9 @@ __decorate([
     __metadata("design:type", String)
 ], Transaction.prototype, "userId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, enum: ['airtime', 'data', 'momo', 'sms', 'reloadly'] }),
     __metadata("design:type", String)
-], Transaction.prototype, "type", void 0);
+], Transaction.prototype, "transType", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Number)
@@ -31,15 +31,15 @@ __decorate([
     __metadata("design:type", String)
 ], Transaction.prototype, "currency", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, enum: ['pending', 'completed', 'failed'] }),
     __metadata("design:type", String)
-], Transaction.prototype, "status", void 0);
+], Transaction.prototype, "transStatus", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Transaction.prototype, "referrerClientId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, mongoose_1.Prop)({ required: true, unique: true }),
     __metadata("design:type", String)
 ], Transaction.prototype, "transactionId", void 0);
 __decorate([
@@ -47,17 +47,97 @@ __decorate([
     __metadata("design:type", String)
 ], Transaction.prototype, "operator", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "recipientPhone", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "recipientEmail", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "dataPackage", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "momoTransactionType", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "reloadlyProductId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "reloadlyOperatorId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "reloadlyOperatorName", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "reloadlyCountryCode", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Transaction.prototype, "transactionFee", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Transaction.prototype, "discountApplied", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Transaction.prototype, "pointsEarned", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Transaction.prototype, "pointsRedeemed", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "transactionMessage", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], Transaction.prototype, "timestamp", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
-    __metadata("design:type", Date)
-], Transaction.prototype, "createdAt", void 0);
+    __metadata("design:type", String)
+], Transaction.prototype, "merchantId", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
-    __metadata("design:type", Date)
-], Transaction.prototype, "updatedAt", void 0);
+    __metadata("design:type", String)
+], Transaction.prototype, "network", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "trxn", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Transaction.prototype, "fee", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "originalAmount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "commentary", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "balance_before", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "balance_after", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Transaction.prototype, "currentBalance", void 0);
 exports.Transaction = Transaction = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Transaction);

@@ -21,13 +21,7 @@ export class AirtimeController {
 
   constructor(private airtimeService: AirtimeService) {}
 
-  @Get('testopup')
-  @ApiOperation({ summary: 'Test airtime top-up' })
-  @ApiResponse({ status: 200, description: 'Airtime top-up processing...' })
-  testAirtime(): string {
-    return `Airtime top-up processing ...`;
-  }
-
+  @UseGuards(JwtAuthGuard)
   @Post('/transtatus')
   @ApiOperation({ summary: 'Query transaction status' })
   @ApiBody({
@@ -38,6 +32,7 @@ export class AirtimeController {
         transactionId: {
           type: 'string',
           description: 'Client transactionId',
+          example: '1234567890',
         },
       },
     },
@@ -45,6 +40,21 @@ export class AirtimeController {
   @ApiResponse({
     status: 200,
     description: 'Transaction status retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          description: 'Transaction status',
+          example: 'success',
+        },
+        message: {
+          type: 'string',
+          description: 'Transaction status message',
+          example: 'Transaction successful',
+        },
+      },
+    },
   })
   public async queryTransactionstatus(
     @Body() qtsDto: TransStatusDto,
@@ -66,27 +76,36 @@ export class AirtimeController {
           type: 'string',
           description: 'The recipient phone number',
           pattern: '^\\+?[1-9]\\d{1,14}$',
+          example: '+1234567890',
         },
         amount: {
           type: 'number',
           description: 'The amount to be transferred',
           minimum: 1,
+          example: 10,
         },
         network: {
           type: 'string',
           description: 'The recipient mobile network provider',
-          enum: ['airtel', 'mtn', 'glo', '9mobile'],
-        },
-        userId: {
-          type: 'string',
-          description: 'The user ID',
-        },
+          enum: ['MTN', 'Telecel', 'AirtelTigo', 'Glo'],
+          example: 'MTN',
+        }
       },
     },
   })
   @ApiResponse({
     status: 200,
     description: 'Airtime top-up processed successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          description: 'Top-up status message',
+          example: 'Top-up successful',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Invalid userId' })
   public async processTopup(
@@ -94,7 +113,7 @@ export class AirtimeController {
     @Request() req,
   ): Promise<any> {
     this.logger.log(`topup airtime dto => ${JSON.stringify(ptDto)}`);
-    this.logger.debug(`topup request() => ${JSON.stringify(req.user)}`);
+    this.logger.log(`topup airtime user => ${req.user}`);
     ptDto.userId = req.user.sub;
     // Validate userId
     if (!ptDto.userId || typeof ptDto.userId !== 'string') {

@@ -20,7 +20,7 @@ async function bootstrap() {
         .setTitle('Lidapay API')
         .setDescription(description)
         .setVersion('1.0')
-        .addTag('lidapay')
+        .addTag('Lidapay')
         .addBearerAuth()
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
@@ -28,7 +28,7 @@ async function bootstrap() {
         swaggerOptions: {
             persistAuthorization: true,
         },
-        customfavIcon: 'https://example.com/favicon.ico',
+        customfavIcon: 'https://advansistechnologies.com/favicon.ico',
         customSiteTitle: 'Lidapay API Documentation',
     });
     const port = parseInt(process.env.PORT, 10) || constants_1.SERVER_PORT;

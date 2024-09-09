@@ -1,6 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { TransactionService } from '../transaction/transaction.service';
+import { CreateTransactionDto } from '../transaction/dto/create-transaction.dto';
+import { UpdateTransactionDto } from '../transaction/dto/update-transaction.dto';
 
 @Injectable()
 export class PrymoService {
@@ -20,7 +22,7 @@ export class PrymoService {
     const transactionId = `prymo_${Date.now()}`;
 
     // Record transaction
-    await this.transactionService.create({
+    const transactionDto: CreateTransactionDto = {
       userId,
       phoneNumber,
       operatorId,
@@ -28,7 +30,16 @@ export class PrymoService {
       currency: 'GHS', // Assuming local currency for Prymo
       transactionId,
       status: 'pending',
-    });
+      type: 'topup', // Adding transaction type
+      operator: operatorId, // Adding operator field
+      serviceCode: 'N/A', // Add missing property
+      transMessage: 'N/A', // Add missing property
+      serviceTransId: 'N/A', // Add missing property
+      transStatus: 'N/A', // Add missing property
+      balance_before: '0', // Add this line
+      balance_after: '0', // Add this line
+    };
+    await this.transactionService.create(transactionDto);
 
     try {
       const response = await this.axiosInstance.post('/topup', {
@@ -38,12 +49,20 @@ export class PrymoService {
       });
 
       // Update transaction status to 'success'
-      await this.transactionService.update(transactionId, { status: 'success' });
+      const updateTransactionDto: UpdateTransactionDto = {
+        status: 'success',
+        ...transactionDto,
+      };
+      await this.transactionService.update(transactionId, updateTransactionDto);
 
       return response.data;
     } catch (error) {
       // Update transaction status to 'failed'
-      await this.transactionService.update(transactionId, { status: 'failed' });
+      const updateTransactionDto: UpdateTransactionDto = {
+        status: 'failed',
+        ...transactionDto,
+      };
+      await this.transactionService.update(transactionId, updateTransactionDto);
       throw new HttpException('Prymo Top-up Failed', HttpStatus.BAD_REQUEST);
     }
   }
@@ -52,26 +71,43 @@ export class PrymoService {
     const transactionId = `prymo_op_${Date.now()}`;
 
     // Record transaction
-    await this.transactionService.create({
+    const transactionDto: CreateTransactionDto = {
       userId,
-      phoneNumber: 'N/A',
-      operatorId: 'N/A',
-      amount: 0,
-      currency: 'N/A',
-      transactionId,
+      phoneNumber: 'N/A', // Assuming 'N/A' for phoneNumber as it's not provided
+      operatorId: 'N/A', // Assuming 'N/A' for operatorId as it's not provided
+      amount: 0, // Assuming 0 for amount as it's not provided
+      currency: 'GHS', // Assuming local currency for Prymo
+      transactionId: transactionId,
       status: 'pending',
-    });
+      type: 'topup', // Adding transaction type
+      operator: 'N/A', // Assuming 'N/A' for operator as it's not provided
+      serviceCode: 'N/A', // Add missing property
+      transMessage: 'N/A', // Add missing property
+      serviceTransId: 'N/A', // Add missing property
+      transStatus: 'N/A', // Add missing property
+      balance_before: '0', // Add this line
+      balance_after: '0', // Add this line
+    };
+    await this.transactionService.create(transactionDto);
 
     try {
       const response = await this.axiosInstance.get('/operators');
 
       // Update transaction status to 'success'
-      await this.transactionService.update(transactionId, { status: 'success'});
+      const updateTransactionDto: UpdateTransactionDto = {
+        status: 'success',
+        ...transactionDto,
+      };
+      await this.transactionService.update(transactionId, updateTransactionDto);
 
       return response.data;
     } catch (error) {
       // Update transaction status to 'failed'
-      await this.transactionService.update(transactionId, { status: 'failed' });
+      const updateTransactionDto: UpdateTransactionDto = {
+        status: 'failed',
+        ...transactionDto,
+      };
+      await this.transactionService.update(transactionId, updateTransactionDto);
       throw new HttpException('Failed to Retrieve Prymo Operators', HttpStatus.BAD_REQUEST);
     }
   }
@@ -80,7 +116,7 @@ export class PrymoService {
     const transactionId = `prymo_sms_${Date.now()}`;
 
     // Record transaction
-    await this.transactionService.create({
+    const transactionDto: CreateTransactionDto = {
       userId,
       phoneNumber,
       operatorId: 'N/A',
@@ -88,7 +124,16 @@ export class PrymoService {
       currency: 'N/A',
       transactionId,
       status: 'pending',
-    });
+      type: 'sms', // Add this line
+      operator: 'N/A',
+      serviceCode: '',
+      transMessage: '',
+      serviceTransId: '',
+      transStatus: '',
+      balance_before: '',
+      balance_after: ''
+    };
+    await this.transactionService.create(transactionDto);
 
     try {
       const response = await this.axiosInstance.post('/sms', {
@@ -97,12 +142,20 @@ export class PrymoService {
       });
 
       // Update transaction status to 'success'
-      await this.transactionService.update(transactionId, { status: 'success' });
+      const updateTransactionDto: UpdateTransactionDto = {
+        status: 'success',
+        ...transactionDto,
+      };
+      await this.transactionService.update(transactionId, updateTransactionDto);
 
       return response.data;
     } catch (error) {
       // Update transaction status to 'failed'
-      await this.transactionService.update(transactionId, { status: 'failed' });
+      const updateTransactionDto: UpdateTransactionDto = {
+        status: 'failed',
+        ...transactionDto,
+      };
+      await this.transactionService.update(transactionId, updateTransactionDto);
       throw new HttpException('Prymo SMS Failed', HttpStatus.BAD_REQUEST);
     }
   }

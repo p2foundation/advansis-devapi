@@ -5,6 +5,8 @@ import { NotificationController } from './notification.controller';
 import { Notification, NotificationSchema } from './schemas/notification.schema';
 import { EmailService } from 'src/utilities/email.service';
 import { SmsService } from 'src/utilities/sms.util';
+import { JwtService } from '@nestjs/jwt';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -13,7 +15,9 @@ import { SmsService } from 'src/utilities/sms.util';
   providers: [
     NotificationService, 
     EmailService, 
-    SmsService
+    SmsService,
+    JwtAuthGuard,
+    JwtService
   ],
   controllers: [NotificationController],
 })

@@ -14,23 +14,35 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MerchantService = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("mongoose");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const merchant_schema_1 = require("./schemas/merchant.schema");
 const uuid_1 = require("uuid");
 const password_util_1 = require("../utilities/password.util");
 const token_util_1 = require("../utilities/token.util");
 const qr_code_util_1 = require("../utilities/qr-code.util");
+const constants_1 = require("../constants");
+const auth_service_1 = require("../auth/auth.service");
+const user_service_1 = require("../user/user.service");
 let MerchantService = class MerchantService {
-    constructor(merchantModel) {
+    constructor(merchantModel, userService, authService) {
         this.merchantModel = merchantModel;
+        this.userService = userService;
+        this.authService = authService;
     }
     async create(createMerchantDto) {
+        const existingMerchant = await this.merchantModel.findOne({
+            $or: [
+                { email: createMerchantDto.email },
+                { phoneNumber: createMerchantDto.phoneNumber }
+            ]
+        }).exec();
+        if (existingMerchant) {
+            throw new common_1.ConflictException('A merchant with this email or phone number already exists');
+        }
         const hashedPassword = await password_util_1.PasswordUtil.hashPassword(createMerchantDto.password);
         const clientId = (0, uuid_1.v4)();
         const clientKey = token_util_1.TokenUtil.generateToken({ clientId }, '365d');
-        const existingMerchant = await this.merchantModel.findOne({ clientId }).exec();
-        if (existingMerchant) {
-            throw new Error('Client ID already exists');
-        }
         const qrCode = await (0, qr_code_util_1.generateQrCode)(clientId);
         const merchantData = {
             ...createMerchantDto,
@@ -38,6 +50,7 @@ let MerchantService = class MerchantService {
             clientId,
             clientKey,
             qrCode,
+            roles: ['merchant'] || createMerchantDto.roles,
             address: [
                 {
                     ghanaPostGPS: createMerchantDto.ghanaPostGPS,
@@ -56,14 +69,33 @@ let MerchantService = class MerchantService {
         return this.merchantModel.findOne({ clientId }).exec();
     }
     async update(merchantId, updateMerchantDto) {
-        const updateData = { ...updateMerchantDto };
+        const updateData = {
+            ...updateMerchantDto,
+            address: [
+                {
+                    ghanaPostGPS: updateMerchantDto.ghanaPostGPS,
+                    street: updateMerchantDto.street,
+                    city: updateMerchantDto.city,
+                    state: updateMerchantDto.state,
+                    zip: updateMerchantDto.zip,
+                    country: updateMerchantDto.country
+                }
+            ]
+        };
         if (updateData.password) {
             updateData.password = await password_util_1.PasswordUtil.hashPassword(updateData.password);
         }
-        return this.merchantModel.findByIdAndUpdate(merchantId, updateData, { new: true }).exec();
+        const updatedMerchant = await this.merchantModel.findByIdAndUpdate(merchantId, updateData, { new: true, runValidators: true }).exec();
+        if (!updatedMerchant) {
+            throw new common_1.NotFoundException(`Merchant with ID "${merchantId}" not found`);
+        }
+        return updatedMerchant;
     }
     async delete(merchantId) {
-        await this.merchantModel.findByIdAndDelete(merchantId).exec();
+        const result = await this.merchantModel.findByIdAndDelete(merchantId).exec();
+        if (!result) {
+            throw new common_1.NotFoundException(`Merchant with ID "${merchantId}" not found`);
+        }
     }
     async updateLastLogin(merchantId) {
         await this.merchantModel.findByIdAndUpdate(merchantId, { lastLogin: new Date() });
@@ -74,13 +106,88 @@ let MerchantService = class MerchantService {
         return { merchants, total };
     }
     async updateRewardPoints(clientId, points) {
-        await this.merchantModel.updateOne({ clientId }, { $inc: { rewardPoints: points } }).exec();
+        const result = await this.merchantModel.updateOne({ clientId }, { $inc: { rewardPoints: points } });
+        if (result.matchedCount === 0) {
+            throw new common_1.NotFoundException('Merchant not found');
+        }
+    }
+    async changePassword(clientId, currentPassword, newPassword) {
+        const merchant = await this.merchantModel.findOne({ clientId }).select('+password');
+        if (!merchant) {
+            throw new common_1.NotFoundException('Merchant not found');
+        }
+        const isPasswordValid = await password_util_1.PasswordUtil.comparePassword(currentPassword, merchant.password);
+        if (!isPasswordValid) {
+            throw new common_1.BadRequestException('Current password is incorrect');
+        }
+        if (currentPassword === newPassword) {
+            throw new common_1.BadRequestException('New password must be different from the current password');
+        }
+        const hashedPassword = await password_util_1.PasswordUtil.hashPassword(newPassword);
+        await this.merchantModel.updateOne({ clientId }, { $set: { password: hashedPassword } });
+    }
+    async trackQRCodeUsage(clientId) {
+        const updatedMerchant = await this.merchantModel.findOneAndUpdate({ clientId }, {
+            $inc: { qrCodeUsageCount: 1 },
+            $set: { lastQRCodeUsage: new Date() }
+        }, { new: true, runValidators: true });
+        if (!updatedMerchant) {
+            throw new common_1.NotFoundException('Merchant not found');
+        }
+        await this.updateRewardPoints(clientId, constants_1.QR_CODE_SCAN_REWARD_POINTS);
+        return updatedMerchant;
+    }
+    async getQRCodeUsageStats(clientId) {
+        const merchant = await this.merchantModel.findOne({ clientId }, 'qrCodeUsageCount lastQRCodeUsage');
+        if (!merchant) {
+            throw new common_1.NotFoundException('Merchant not found');
+        }
+        return {
+            usageCount: merchant.qrCodeUsageCount || 0,
+            lastUsed: merchant.lastQRCodeUsage || null,
+        };
+    }
+    async generateInvitationLink(merchantId) {
+        const merchant = await this.merchantModel.findById(merchantId);
+        if (!merchant) {
+            throw new common_1.NotFoundException('Merchant not found');
+        }
+        const invitationLink = `${process.env.APP_URL}/merchant-invite/${(0, uuid_1.v4)()}`;
+        merchant.invitationLink = invitationLink;
+        await merchant.save();
+        return invitationLink;
+    }
+    async trackInvitationLinkUsage(invitationLink) {
+        const merchant = await this.merchantModel.findOne({ invitationLink });
+        if (!merchant) {
+            throw new common_1.NotFoundException('Invalid invitation link');
+        }
+        const updatedMerchant = await this.merchantModel.findByIdAndUpdate(merchant._id, {
+            $inc: { invitationLinkUsageCount: 1 },
+            $set: { lastInvitationLinkUsage: new Date() }
+        }, { new: true, runValidators: true });
+        await this.updateRewardPoints(merchant.clientId, constants_1.MERCHANT_INVITATION_LINK_REWARD_POINTS);
+        return updatedMerchant;
+    }
+    async getInvitationLinkStats(clientId) {
+        const merchant = await this.merchantModel.findOne({ clientId }, 'invitationLinkUsageCount lastInvitationLinkUsage');
+        if (!merchant) {
+            throw new common_1.NotFoundException('Merchant not found');
+        }
+        return {
+            usageCount: merchant.invitationLinkUsageCount || 0,
+            lastUsed: merchant.lastInvitationLinkUsage || null,
+        };
     }
 };
 exports.MerchantService = MerchantService;
 exports.MerchantService = MerchantService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('MerchantModel')),
-    __metadata("design:paramtypes", [mongoose_1.Model])
+    __param(0, (0, mongoose_1.InjectModel)(merchant_schema_1.Merchant.name)),
+    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => user_service_1.UserService))),
+    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => auth_service_1.AuthService))),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        user_service_1.UserService,
+        auth_service_1.AuthService])
 ], MerchantService);
 //# sourceMappingURL=merchant.service.js.map

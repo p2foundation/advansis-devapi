@@ -9,5 +9,11 @@ export class CreateTransactionDto {
     operatorId: string; // Add this line
     transactionId: string; // Add this line
     status: string;
+    serviceCode: string;
+    transMessage: string;
+    serviceTransId: string;
+    transStatus: string;
+    balance_before: string;
+    balance_after: string;
   }
   

@@ -15,6 +15,8 @@ const transaction_module_1 = require("../transaction/transaction.module");
 const axios_1 = require("@nestjs/axios");
 const merchant_module_1 = require("../merchant/merchant.module");
 const merchant_service_1 = require("../merchant/merchant.service");
+const auth_module_1 = require("../auth/auth.module");
+const user_module_1 = require("../user/user.module");
 let PrymoModule = class PrymoModule {
 };
 exports.PrymoModule = PrymoModule;
@@ -23,7 +25,9 @@ exports.PrymoModule = PrymoModule = __decorate([
         imports: [
             axios_1.HttpModule,
             transaction_module_1.TransactionModule,
-            merchant_module_1.MerchantModule
+            (0, common_1.forwardRef)(() => merchant_module_1.MerchantModule),
+            (0, common_1.forwardRef)(() => user_module_1.UserModule),
+            (0, common_1.forwardRef)(() => auth_module_1.AuthModule),
         ],
         providers: [
             prymo_service_1.PrymoService,

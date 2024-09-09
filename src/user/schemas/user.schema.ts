@@ -4,17 +4,19 @@ import { Document } from 'mongoose';
 export type UserDocument = User & Document;
 
 @Schema()
-export class User {
-  @Prop({ required: true })
+export class User extends Document {
+  @Prop({ unique: true })
+  email: string;
+
+  @Prop({ unique: true })
   username: string;
+
   @Prop()
   firstName: string;
   @Prop()
   lastName: string;
   @Prop({ required: true })
   password: string;
-  @Prop()
-  email: string;
   @Prop()
   phoneNumber: string;
   
@@ -38,6 +40,21 @@ export class User {
   createdAt: Date;
   @Prop({ default: Date.now() })
   updatedAt: Date;
+
+  @Prop({ default: 0 })
+  qrCodeUsageCount: number;
+
+  @Prop()
+  lastQRCodeUsage: Date;
+
+  @Prop({ default: '' })
+  invitationLink: string;
+
+  @Prop({ default: 0 })
+  invitationLinkUsageCount: number;
+
+  @Prop()
+  lastInvitationLinkUsage: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

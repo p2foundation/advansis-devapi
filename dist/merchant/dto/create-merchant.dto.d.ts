@@ -3,6 +3,7 @@ export declare class CreateMerchantDto {
     readonly email: string;
     readonly phoneNumber: string;
     readonly password: string;
+    readonly roles: string[];
     street?: string;
     city?: string;
     ghanaPostGPS?: string;

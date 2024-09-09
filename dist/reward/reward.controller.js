@@ -112,7 +112,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RewardController.prototype, "delete", null);
 exports.RewardController = RewardController = __decorate([
-    (0, swagger_1.ApiTags)('rewards'),
+    (0, swagger_1.ApiTags)('Rewards'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('api/v1/rewards'),
     __metadata("design:paramtypes", [reward_service_1.RewardService])

@@ -5,13 +5,14 @@ export declare class AuthService {
     private readonly userService;
     private readonly jwtService;
     private readonly merchantService;
-    private logger;
+    private readonly logger;
     constructor(userService: UserService, jwtService: JwtService, merchantService: MerchantService);
     validateUser(username: string, password: string): Promise<any>;
     login(user: any): Promise<any>;
     generateRefreshToken(payload: any): string;
     refreshToken(refreshToken: string): Promise<any>;
     validateMerchant(clientId: string, clientKey: string): Promise<any>;
+    changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean>;
     merchantLogin(merchant: any): Promise<{
         access_token: string;
         refresh_token: string;

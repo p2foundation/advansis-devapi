@@ -1,47 +1,38 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
+import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { JwtRefreshStrategy } from './jwt-refresh.strategy';
-import { JWT_SECRET } from '../constants';
-import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
-import { EmailService } from '../utilities/email.service';
-import { SmsService } from '../utilities/sms.util';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { GravatarService } from '../utilities/gravatar.util';
-import { LocalStrategy } from './local.strategy';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RolesGuard } from './roles.guard';
 import { MerchantModule } from 'src/merchant/merchant.module';
-import { MerchantService } from 'src/merchant/merchant.service';
+import { LocalStrategy } from './local.strategy';
+import { MerchantAuthGuard } from './merchant-auth.guard';
+import { JWT_SECRET } from 'src/constants';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
-    JwtModule.register({
-      global: true,
-      secret:  `${process.env.JWT_SECRET}` || `${JWT_SECRET}`,
-      signOptions: { expiresIn: '60m' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || JWT_SECRET,
+        signOptions: { expiresIn: '60m' },
+      }),
+      inject: [ConfigService],
     }),
-    MerchantModule
+    MerchantModule,
   ],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    JwtRefreshStrategy,
-    JwtService,
-    UserService,
-    EmailService,
-    SmsService,
-    GravatarService,
-    LocalStrategy,
-    MerchantService
-  ],
+  providers: [AuthService, MerchantAuthGuard, JwtStrategy, RolesGuard, LocalStrategy],
   exports: [
-    AuthService,
-    EmailService,
-    SmsService
-  ]
+    AuthService, 
+    MerchantAuthGuard, 
+    JwtStrategy, 
+    RolesGuard, 
+    LocalStrategy,
+    JwtModule
+  ],
 })
 export class AuthModule {}

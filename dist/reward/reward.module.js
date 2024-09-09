@@ -12,14 +12,19 @@ const mongoose_1 = require("@nestjs/mongoose");
 const reward_service_1 = require("./reward.service");
 const reward_controller_1 = require("./reward.controller");
 const reward_schema_1 = require("./schemas/reward.schema");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const jwt_1 = require("@nestjs/jwt");
 let RewardModule = class RewardModule {
 };
 exports.RewardModule = RewardModule;
 exports.RewardModule = RewardModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: reward_schema_1.Reward.name, schema: reward_schema_1.RewardSchema }])],
-        providers: [reward_service_1.RewardService],
+        imports: [
+            mongoose_1.MongooseModule.forFeature([{ name: reward_schema_1.Reward.name, schema: reward_schema_1.RewardSchema }])
+        ],
+        providers: [reward_service_1.RewardService, jwt_auth_guard_1.JwtAuthGuard, jwt_1.JwtService],
         controllers: [reward_controller_1.RewardController],
+        exports: [reward_service_1.RewardService, mongoose_1.MongooseModule],
     })
 ], RewardModule);
 //# sourceMappingURL=reward.module.js.map

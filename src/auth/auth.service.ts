@@ -9,7 +9,7 @@ import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
-  private logger = new Logger(AuthService.name);
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly userService: UserService,
@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   async login(user: any): Promise<any> {
-    // this.logger.verbose(`Login User ==> ${JSON.stringify(user)}`);
+    this.logger.verbose(`Login User ==> ${JSON.stringify(user)}`);
     try {
       const payload = {
         username: user._doc.username,
@@ -80,7 +80,7 @@ export class AuthService {
       return this.login(user);
     } catch (error) {
       this.logger.error(`Error refreshing token: ${error.message}`);
-      throw new Error(`Failed to refresh token: ${error.message}`);
+      throw new UnauthorizedException(`Failed to refresh token: ${error.message}`);
     }
   }
 
@@ -120,8 +120,8 @@ export class AuthService {
   async merchantLogin(merchant: any) {
     try {
       const payload = { 
-        clientId: merchant.clientId, 
-        sub: merchant._id, 
+        name: merchant._doc.name, 
+        sub: merchant._doc._id, 
         roles: ['merchant'],
         // name: merchant.name,
         // email: merchant.email

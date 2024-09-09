@@ -25,9 +25,6 @@ let AirtimeController = AirtimeController_1 = class AirtimeController {
         this.airtimeService = airtimeService;
         this.logger = new common_1.Logger(AirtimeController_1.name);
     }
-    testAirtime() {
-        return `Airtime top-up processing ...`;
-    }
     async queryTransactionstatus(qtsDto) {
         this.logger.log(`transtatus dto => ${JSON.stringify(qtsDto)}`);
         const ts = await this.airtimeService.transactionStatus(qtsDto);
@@ -35,7 +32,7 @@ let AirtimeController = AirtimeController_1 = class AirtimeController {
     }
     async processTopup(ptDto, req) {
         this.logger.log(`topup airtime dto => ${JSON.stringify(ptDto)}`);
-        this.logger.debug(`topup request() => ${JSON.stringify(req.user)}`);
+        this.logger.log(`topup airtime user => ${req.user}`);
         ptDto.userId = req.user.sub;
         if (!ptDto.userId || typeof ptDto.userId !== 'string') {
             throw new common_1.BadRequestException('Invalid userId');
@@ -45,14 +42,7 @@ let AirtimeController = AirtimeController_1 = class AirtimeController {
 };
 exports.AirtimeController = AirtimeController;
 __decorate([
-    (0, common_1.Get)('testopup'),
-    (0, swagger_1.ApiOperation)({ summary: 'Test airtime top-up' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Airtime top-up processing...' }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", String)
-], AirtimeController.prototype, "testAirtime", null);
-__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('/transtatus'),
     (0, swagger_1.ApiOperation)({ summary: 'Query transaction status' }),
     (0, swagger_1.ApiBody)({
@@ -63,6 +53,7 @@ __decorate([
                 transactionId: {
                     type: 'string',
                     description: 'Client transactionId',
+                    example: '1234567890',
                 },
             },
         },
@@ -70,6 +61,21 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Transaction status retrieved successfully',
+        schema: {
+            type: 'object',
+            properties: {
+                status: {
+                    type: 'string',
+                    description: 'Transaction status',
+                    example: 'success',
+                },
+                message: {
+                    type: 'string',
+                    description: 'Transaction status message',
+                    example: 'Transaction successful',
+                },
+            },
+        },
     }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -89,27 +95,36 @@ __decorate([
                     type: 'string',
                     description: 'The recipient phone number',
                     pattern: '^\\+?[1-9]\\d{1,14}$',
+                    example: '+1234567890',
                 },
                 amount: {
                     type: 'number',
                     description: 'The amount to be transferred',
                     minimum: 1,
+                    example: 10,
                 },
                 network: {
                     type: 'string',
                     description: 'The recipient mobile network provider',
-                    enum: ['airtel', 'mtn', 'glo', '9mobile'],
-                },
-                userId: {
-                    type: 'string',
-                    description: 'The user ID',
-                },
+                    enum: ['MTN', 'Telecel', 'AirtelTigo', 'Glo'],
+                    example: 'MTN',
+                }
             },
         },
     }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Airtime top-up processed successfully',
+        schema: {
+            type: 'object',
+            properties: {
+                message: {
+                    type: 'string',
+                    description: 'Top-up status message',
+                    example: 'Top-up successful',
+                },
+            },
+        },
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid userId' }),
     __param(0, (0, common_1.Body)()),

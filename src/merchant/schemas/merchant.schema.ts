@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 export type MerchantDocument = Merchant & Document;
 
 @Schema()
-export class Merchant {
+export class Merchant extends Document {
   @Prop({ required: true })
   name: string;
 
@@ -29,6 +29,9 @@ export class Merchant {
   @Prop({ default: 0 })
   rewardPoints: number;
 
+  @Prop({ default: ['merchant'] })
+  roles: string[];
+
   @Prop()
   address?: Array<{
     ghanaPostGPS: string,
@@ -38,13 +41,33 @@ export class Merchant {
     zip: string;
     country: string,
   }>;
-  
+
   @Prop()
   lastLogin: Date;
+
+  @Prop({ default: 0 })
+  qrCodeUsageCount: number;
+
+  @Prop()
+  lastQRCodeUsage: Date;
+
+  @Prop({ default: '' })
+  invitationLink: string;
+
+  @Prop({ default: 0 })
+  invitationLinkUsageCount: number;
+
+  @Prop()
+  lastInvitationLinkUsage: Date;
+
+  @Prop({ type: String, required: false })
+  taxId: string;
+
   @Prop({ default: Date.now() })
   createdAt: Date;
   @Prop({ default: Date.now() })
   updatedAt: Date;
+
   // Other properties...
 }
 

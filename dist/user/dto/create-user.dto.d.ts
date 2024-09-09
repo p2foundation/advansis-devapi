@@ -6,6 +6,7 @@ export declare class CreateUserDto {
     readonly password: string;
     readonly roles: string[];
     readonly email: string;
-    readonly phoneNumber: string;
+    phoneNumber: string;
+    mobile?: string;
     readonly referrerClientId?: string;
 }

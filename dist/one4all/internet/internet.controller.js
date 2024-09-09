@@ -57,7 +57,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], InternetController.prototype, "listDataBundle", null);
 exports.InternetController = InternetController = __decorate([
-    (0, swagger_1.ApiTags)('internet'),
+    (0, swagger_1.ApiTags)('Internet'),
     (0, common_1.Controller)('api/v1/internet'),
     __metadata("design:paramtypes", [internet_service_1.InternetService])
 ], InternetController);

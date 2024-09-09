@@ -8,20 +8,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const passport_1 = require("@nestjs/passport");
 const auth_service_1 = require("./auth.service");
-const jwt_strategy_1 = require("./jwt.strategy");
-const jwt_refresh_strategy_1 = require("./jwt-refresh.strategy");
-const constants_1 = require("../constants");
-const user_service_1 = require("../user/user.service");
-const user_module_1 = require("../user/user.module");
-const email_service_1 = require("../utilities/email.service");
-const sms_util_1 = require("../utilities/sms.util");
 const jwt_1 = require("@nestjs/jwt");
-const gravatar_util_1 = require("../utilities/gravatar.util");
-const local_strategy_1 = require("./local.strategy");
+const passport_1 = require("@nestjs/passport");
+const jwt_strategy_1 = require("./jwt.strategy");
+const user_module_1 = require("../user/user.module");
+const config_1 = require("@nestjs/config");
+const roles_guard_1 = require("./roles.guard");
 const merchant_module_1 = require("../merchant/merchant.module");
-const merchant_service_1 = require("../merchant/merchant.service");
+const local_strategy_1 = require("./local.strategy");
+const merchant_auth_guard_1 = require("./merchant-auth.guard");
+const constants_1 = require("../constants");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -30,30 +27,25 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             user_module_1.UserModule,
             passport_1.PassportModule,
-            jwt_1.JwtModule.register({
-                global: true,
-                secret: `${process.env.JWT_SECRET}` || `${constants_1.JWT_SECRET}`,
-                signOptions: { expiresIn: '60m' },
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: async (configService) => ({
+                    secret: configService.get('JWT_SECRET') || constants_1.JWT_SECRET,
+                    signOptions: { expiresIn: '60m' },
+                }),
+                inject: [config_1.ConfigService],
             }),
-            merchant_module_1.MerchantModule
+            merchant_module_1.MerchantModule,
         ],
-        providers: [
-            auth_service_1.AuthService,
-            jwt_strategy_1.JwtStrategy,
-            jwt_refresh_strategy_1.JwtRefreshStrategy,
-            jwt_1.JwtService,
-            user_service_1.UserService,
-            email_service_1.EmailService,
-            sms_util_1.SmsService,
-            gravatar_util_1.GravatarService,
-            local_strategy_1.LocalStrategy,
-            merchant_service_1.MerchantService
-        ],
+        providers: [auth_service_1.AuthService, merchant_auth_guard_1.MerchantAuthGuard, jwt_strategy_1.JwtStrategy, roles_guard_1.RolesGuard, local_strategy_1.LocalStrategy],
         exports: [
             auth_service_1.AuthService,
-            email_service_1.EmailService,
-            sms_util_1.SmsService
-        ]
+            merchant_auth_guard_1.MerchantAuthGuard,
+            jwt_strategy_1.JwtStrategy,
+            roles_guard_1.RolesGuard,
+            local_strategy_1.LocalStrategy,
+            jwt_1.JwtModule
+        ],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

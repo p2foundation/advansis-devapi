@@ -26,7 +26,7 @@ let PrymoService = class PrymoService {
     }
     async topUp(phoneNumber, operatorId, amount, userId) {
         const transactionId = `prymo_${Date.now()}`;
-        await this.transactionService.create({
+        const transactionDto = {
             userId,
             phoneNumber,
             operatorId,
@@ -34,45 +34,79 @@ let PrymoService = class PrymoService {
             currency: 'GHS',
             transactionId,
             status: 'pending',
-        });
+            type: 'topup',
+            operator: operatorId,
+            serviceCode: 'N/A',
+            transMessage: 'N/A',
+            serviceTransId: 'N/A',
+            transStatus: 'N/A',
+            balance_before: '0',
+            balance_after: '0',
+        };
+        await this.transactionService.create(transactionDto);
         try {
             const response = await this.axiosInstance.post('/topup', {
                 phoneNumber,
                 operatorId,
                 amount,
             });
-            await this.transactionService.update(transactionId, { status: 'success' });
+            const updateTransactionDto = {
+                status: 'success',
+                ...transactionDto,
+            };
+            await this.transactionService.update(transactionId, updateTransactionDto);
             return response.data;
         }
         catch (error) {
-            await this.transactionService.update(transactionId, { status: 'failed' });
+            const updateTransactionDto = {
+                status: 'failed',
+                ...transactionDto,
+            };
+            await this.transactionService.update(transactionId, updateTransactionDto);
             throw new common_1.HttpException('Prymo Top-up Failed', common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async getOperators(userId) {
         const transactionId = `prymo_op_${Date.now()}`;
-        await this.transactionService.create({
+        const transactionDto = {
             userId,
             phoneNumber: 'N/A',
             operatorId: 'N/A',
             amount: 0,
-            currency: 'N/A',
-            transactionId,
+            currency: 'GHS',
+            transactionId: transactionId,
             status: 'pending',
-        });
+            type: 'topup',
+            operator: 'N/A',
+            serviceCode: 'N/A',
+            transMessage: 'N/A',
+            serviceTransId: 'N/A',
+            transStatus: 'N/A',
+            balance_before: '0',
+            balance_after: '0',
+        };
+        await this.transactionService.create(transactionDto);
         try {
             const response = await this.axiosInstance.get('/operators');
-            await this.transactionService.update(transactionId, { status: 'success' });
+            const updateTransactionDto = {
+                status: 'success',
+                ...transactionDto,
+            };
+            await this.transactionService.update(transactionId, updateTransactionDto);
             return response.data;
         }
         catch (error) {
-            await this.transactionService.update(transactionId, { status: 'failed' });
+            const updateTransactionDto = {
+                status: 'failed',
+                ...transactionDto,
+            };
+            await this.transactionService.update(transactionId, updateTransactionDto);
             throw new common_1.HttpException('Failed to Retrieve Prymo Operators', common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async sendSMS(phoneNumber, message, userId) {
         const transactionId = `prymo_sms_${Date.now()}`;
-        await this.transactionService.create({
+        const transactionDto = {
             userId,
             phoneNumber,
             operatorId: 'N/A',
@@ -80,17 +114,34 @@ let PrymoService = class PrymoService {
             currency: 'N/A',
             transactionId,
             status: 'pending',
-        });
+            type: 'sms',
+            operator: 'N/A',
+            serviceCode: '',
+            transMessage: '',
+            serviceTransId: '',
+            transStatus: '',
+            balance_before: '',
+            balance_after: ''
+        };
+        await this.transactionService.create(transactionDto);
         try {
             const response = await this.axiosInstance.post('/sms', {
                 phoneNumber,
                 message,
             });
-            await this.transactionService.update(transactionId, { status: 'success' });
+            const updateTransactionDto = {
+                status: 'success',
+                ...transactionDto,
+            };
+            await this.transactionService.update(transactionId, updateTransactionDto);
             return response.data;
         }
         catch (error) {
-            await this.transactionService.update(transactionId, { status: 'failed' });
+            const updateTransactionDto = {
+                status: 'failed',
+                ...transactionDto,
+            };
+            await this.transactionService.update(transactionId, updateTransactionDto);
             throw new common_1.HttpException('Prymo SMS Failed', common_1.HttpStatus.BAD_REQUEST);
         }
     }

@@ -57,21 +57,23 @@ let AirtimeService = AirtimeService_1 = class AirtimeService {
             merchantId: merchantId,
             transType: 'AIRTIME TOPUP',
             retailer: constants_1.ONE4ALL_RETAILER || retailer,
-            network: 0 || network,
-            amount: amount || '',
+            network: network || 0,
             trxn: generator_util_1.GeneratorUtil.generateTransactionId() || '',
+            fee: constants_1.FEE_CHARGES || 0,
             originalAmount: amount || '',
-            fee: 0,
+            amount: `${amount}+${constants_1.FEE_CHARGES}` || '',
             recipientNumber: recipientNumber || '',
             transMessage: '',
-            transStatus: '',
-            commentary: '',
+            transStatus: 'pending',
+            transCode: '',
+            commentary: `${userId} topup airtime ${amount} ${network} ${recipientNumber}`,
             balance_before: '',
             balance_after: '',
             currentBalance: '',
         };
         this.logger.log(`AIRTIME TOPUP params == ${JSON.stringify(taParams)}`);
         const taUrl = `/TopUpApi/airtime?retailer=${taParams.retailer}&recipient=${taParams.recipientNumber}&amount=${taParams.amount}&network=${taParams.network}&trxn=${taParams.trxn}`;
+        this.transService.create(taParams);
         const configs = {
             url: this.AirBaseUrl + taUrl,
             headers: { ApiKey: constants_1.ONE4ALL_APIKEY, ApiSecret: constants_1.ONE4ALL_APISECRET },
@@ -89,28 +91,30 @@ let AirtimeService = AirtimeService_1 = class AirtimeService {
             this.logger.verbose(`AIRTIME TOPUP response ++++ ${JSON.stringify(taRes.data)}`);
             if (taRes.data.status_code === '02') {
                 this.logger.warn(`insufficient balance`);
-                taParams.serviceCode = '';
-                taParams.transMessage = '';
-                taParams.serviceTransId = '';
-                taParams.transStatus = '';
-                taParams.commentary = '';
-                this.transService.create(taParams);
+                taParams.serviceCode = taRes.data['status-code'];
+                taParams.transMessage = taRes.data.message;
+                taParams.serviceTransId = taRes.data.trxn;
+                taParams.transStatus = taRes.data.status;
+                taParams.commentary = 'insufficient balance, topup failed';
+                this.transService.update(taParams.trxn, taParams);
             }
             else if (taRes.data.status_code === '09') {
                 this.logger.warn(`recharge requested but awaiting status`);
-                taParams.serviceCode = '';
-                taParams.transMessage = '';
-                taParams.serviceTransId = '';
-                taParams.transStatus = '';
-                taParams.commentary = '';
+                taParams.serviceCode = taRes.data['status-code'];
+                taParams.transMessage = taRes.data.message;
+                taParams.serviceTransId = taRes.data.trxn;
+                taParams.transStatus = taRes.data.status;
+                taParams.commentary = 'recharge requested but awaiting status';
+                this.transService.update(taParams.trxn, taParams);
             }
             else if (taRes.data.status_code === '06') {
                 this.logger.log(`other error message`);
-                taParams.serviceCode = '';
-                taParams.transMessage = '';
-                taParams.serviceTransId = '';
-                taParams.transStatus = '';
-                taParams.commentary = '';
+                taParams.serviceCode = taRes.data['status-code'];
+                taParams.transMessage = taRes.data.message;
+                taParams.serviceTransId = taRes.data.trxn;
+                taParams.transStatus = taRes.data.status;
+                taParams.commentary = 'Other error message';
+                this.transService.update(taParams.trxn, taParams);
             }
             else if (taRes.data.status_code === '00') {
                 this.logger.verbose(`airtime topup successful`);
@@ -120,12 +124,16 @@ let AirtimeService = AirtimeService_1 = class AirtimeService {
                 taParams.transStatus = taRes.data.status;
                 taParams.balance_before = taRes.data.balance_before;
                 taParams.balance_after = taRes.data.balance_after;
-                taParams.commentary = `Airtime top-up for ${recipientNumber} successful`;
-                this.transService.create(taParams);
+                this.transService.update(taParams.trxn, taParams);
             }
             return taRes.data;
         }), (0, operators_1.catchError)((taError) => {
             this.logger.error(`AIRTIME TOP-UP ERROR response --- ${JSON.stringify(taError.response.data)}`);
+            taParams.serviceCode = taError.response.data['status-code'];
+            taParams.transMessage = taError.response.data.message;
+            taParams.serviceTransId = taError.response.data.trxn;
+            taParams.transStatus = taError.response.data.status;
+            this.transService.update(taParams.trxn, taParams);
             const taErrorMessage = taError.response.data;
             throw new common_1.NotFoundException(taErrorMessage);
         }));

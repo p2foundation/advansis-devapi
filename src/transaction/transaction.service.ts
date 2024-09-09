@@ -1,57 +1,83 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Transaction, TransactionDocument } from './schemas/transaction.schema';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { MerchantService } from '../merchant/merchant.service';
-import * as crypto from 'crypto';
 
 @Injectable()
 export class TransactionService {
-  constructor(
-    @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
-    private readonly merchantService: MerchantService,
-  ) {}
+	constructor(
+		@InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>
+	) {}
 
-  async create(createTransactionDto: Partial<CreateTransactionDto>): Promise<Transaction> {
-    const createdTransaction = new this.transactionModel({
-      ...createTransactionDto,
-      status: 'pending',
-      transactionId: this.generateTransactionId(),
-    });
+  //create transaction
+	async create(createTransactionDto: CreateTransactionDto): Promise<Transaction> {
+		const createdTransaction = new this.transactionModel(createTransactionDto);
+		return createdTransaction.save();
+	}
 
-    const savedTransaction = await createdTransaction.save();
+  //find all transactions
+	async findAll(): Promise<Transaction[]> {
+		return this.transactionModel.find().exec();
+	}
 
-    if (createTransactionDto.referrerClientId) {
-      await this.merchantService.updateRewardPoints(createTransactionDto.referrerClientId, 5); // Example reward points for a transaction
-    }
+  //find one transaction
+	async findOne(id: string): Promise<Transaction> {
+		const transaction = await this.transactionModel.findById(id).exec();
+		if (!transaction) {
+			throw new NotFoundException(`Transaction #${id} not found`);
+		}
+		return transaction;
+	}
 
-    return savedTransaction;
-  }
+  //update transaction
+	async update(id: string, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
+		const updatedTransaction = await this.transactionModel
+			.findByIdAndUpdate(id, updateTransactionDto, { new: true })
+			.exec();
+		if (!updatedTransaction) {
+			throw new NotFoundException(`Transaction #${id} not found`);
+		}
+		return updatedTransaction;
+	}
 
-  async findAll(): Promise<Transaction[]> {
-    return this.transactionModel.find().exec();
-  }
+  //delete transaction
+	async remove(id: string): Promise<Transaction> {
+		const deletedTransaction = await this.transactionModel.findByIdAndDelete(id).exec();
+		if (!deletedTransaction) {
+			throw new NotFoundException(`Transaction #${id} not found`);
+		}
+		return deletedTransaction;
+	}
 
-  async findOne(transactionId: string): Promise<Transaction> {
-    return this.transactionModel.findOne({ transactionId }).exec();
-  }
+  //find transactions by user id
+	async findByUserId(userId: string): Promise<Transaction[]> {
+		return this.transactionModel.find({ userId }).exec();
+	}
 
-  async update(transactionId: string, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
-    return this.transactionModel.findOneAndUpdate(
-      { transactionId }, 
-      updateTransactionDto, 
-      { new: true }
-    ).exec();
-  }
+  //find transactions by type
+	async findByType(type: string): Promise<Transaction[]> {
+		return this.transactionModel.find({ transactionType: type }).exec();
+	}
 
-  async delete(transactionId: string): Promise<void> {
-    await this.transactionModel.findOneAndDelete({ transactionId }).exec();
-  }
+  //find transactions by status
+	async findByStatus(status: string): Promise<Transaction[]> {
+		return this.transactionModel.find({ status }).exec();
+	}
 
-  private generateTransactionId(): string {
-    return 'txn_' + crypto.randomBytes(4).toString('hex'); // Generates a 8-character hex string
-  }
+  //get transaction stats
+	async getTransactionStats(userId: string): Promise<any> {
+		const stats = await this.transactionModel.aggregate([
+			{ $match: { userId } },
+			{ $group: {
+				_id: '$transactionType',
+				count: { $sum: 1 },
+				totalAmount: { $sum: '$amount' },
+				avgAmount: { $avg: '$amount' }
+			}}
+		]).exec();
+		return stats;
+	}
 }
 

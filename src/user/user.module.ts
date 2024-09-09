@@ -9,22 +9,27 @@ import { AuthModule } from '../auth/auth.module';
 import { GravatarService } from 'src/utilities/gravatar.util';
 import { MerchantService } from 'src/merchant/merchant.service';
 import { MerchantModule } from 'src/merchant/merchant.module';
-
+import { NodemailService } from 'src/utilities/nodemail.service';
+import { ConfigModule } from '@nestjs/config';
+import { RewardModule } from 'src/reward/reward.module';
 
 @Module({
   imports: [
+    ConfigModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     forwardRef(() => AuthModule),
-    MerchantModule// Update this line
+    forwardRef(() => MerchantModule),
+    RewardModule,
   ],
+  controllers: [UserController],
   providers: [
     UserService, 
     EmailService, 
     SmsService,
     GravatarService,
-    MerchantService
+    MerchantService,
+    NodemailService
   ],
-  controllers: [UserController],
   exports: [UserService, MongooseModule], // Export UserService and MongooseModule
 })
 export class UserModule { }

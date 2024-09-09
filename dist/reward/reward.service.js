@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const reward_schema_1 = require("./schemas/reward.schema");
+const constants_1 = require("../constants");
 let RewardService = class RewardService {
     constructor(rewardModel) {
         this.rewardModel = rewardModel;
@@ -45,6 +46,14 @@ let RewardService = class RewardService {
     }
     async delete(userId) {
         await this.rewardModel.findOneAndDelete({ userId }).exec();
+    }
+    async awardQRCodeScanPoints(scannerId, scannerType) {
+        if (scannerType === 'user') {
+            await this.userService.addPoints(scannerId, constants_1.QR_CODE_SCAN_REWARD_POINTS);
+        }
+        else {
+            await this.merchantService.updateRewardPoints(scannerId, constants_1.QR_CODE_SCAN_REWARD_POINTS);
+        }
     }
 };
 exports.RewardService = RewardService;

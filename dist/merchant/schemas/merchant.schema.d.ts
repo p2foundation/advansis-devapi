@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 export type MerchantDocument = Merchant & Document;
-export declare class Merchant {
+export declare class Merchant extends Document {
     name: string;
     email: string;
     phoneNumber: string;
@@ -9,6 +9,7 @@ export declare class Merchant {
     password: string;
     qrCode: string;
     rewardPoints: number;
+    roles: string[];
     address?: Array<{
         ghanaPostGPS: string;
         street: string;
@@ -18,11 +19,17 @@ export declare class Merchant {
         country: string;
     }>;
     lastLogin: Date;
+    qrCodeUsageCount: number;
+    lastQRCodeUsage: Date;
+    invitationLink: string;
+    invitationLinkUsageCount: number;
+    lastInvitationLinkUsage: Date;
+    taxId: string;
     createdAt: Date;
     updatedAt: Date;
 }
-export declare const MerchantSchema: import("mongoose").Schema<Merchant, import("mongoose").Model<Merchant, any, any, any, Document<unknown, any, Merchant> & Merchant & {
-    _id: import("mongoose").Types.ObjectId;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Merchant, Document<unknown, {}, import("mongoose").FlatRecord<Merchant>> & import("mongoose").FlatRecord<Merchant> & {
-    _id: import("mongoose").Types.ObjectId;
-}>;
+export declare const MerchantSchema: import("mongoose").Schema<Merchant, import("mongoose").Model<Merchant, any, any, any, Document<unknown, any, Merchant> & Merchant & Required<{
+    _id: unknown;
+}>, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Merchant, Document<unknown, {}, import("mongoose").FlatRecord<Merchant>> & import("mongoose").FlatRecord<Merchant> & Required<{
+    _id: unknown;
+}>>;

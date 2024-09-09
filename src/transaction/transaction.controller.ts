@@ -1,61 +1,110 @@
-import { Controller, Get, Post, Body, Put, Delete, Param, UseGuards, Request, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Transactions')
-@Controller('api/v1/transactions')
+@Controller('transactions')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class TransactionController {
-  private logger = new Logger(TransactionController.name);
-
   constructor(private readonly transactionService: TransactionService) {}
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new transaction' })
-  @ApiResponse({ status: 201, description: 'Transaction created successfully', type: CreateTransactionDto })
   @Post()
-  async create(@Body() createTransactionDto: CreateTransactionDto) {
-    this.logger.log(`Creating transaction: ${JSON.stringify(createTransactionDto)}`);
+  @ApiOperation({ summary: 'Create a new transaction' })
+  @ApiResponse({ status: 201, description: 'The transaction has been successfully created.' })
+  @ApiBody({
+    type: CreateTransactionDto,
+    description: 'Transaction data',
+    examples: {
+      example1: {
+        value: {
+          userId: '123456',
+          transactionType: 'airtime',
+          amount: 10,
+          currency: 'GHS',
+          status: 'pending',
+          transactionId: 'TRX123456',
+          operator: 'MTN',
+          recipientPhone: '233241234567'
+        }
+      }
+    }
+  })
+  create(@Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionService.create(createTransactionDto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Find all transactions' })
-  @ApiResponse({ status: 200, description: 'List of transactions', isArray: true, type: [CreateTransactionDto] })
   @Get()
-  async findAll() {
+  @ApiOperation({ summary: 'Get all transactions' })
+  @ApiResponse({ status: 200, description: 'Return all transactions.' })
+  findAll() {
     return this.transactionService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Find a transaction by ID' })
-  @ApiResponse({ status: 200, description: 'Transaction found', type: CreateTransactionDto })
-  @Get(':transactionId')
-  async findOne(@Param('transactionId') transactionId: string) {
-    return this.transactionService.findOne(transactionId);
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a transaction by id' })
+  @ApiResponse({ status: 200, description: 'Return the transaction.' })
+  @ApiResponse({ status: 404, description: 'Transaction not found.' })
+  findOne(@Param('id') id: string) {
+    return this.transactionService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @Put(':id')
   @ApiOperation({ summary: 'Update a transaction' })
-  @ApiResponse({ status: 200, description: 'Transaction updated successfully', type: UpdateTransactionDto })
-  @Put(':transactionId')
-  async update(@Param('transactionId') transactionId: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionService.update(transactionId, updateTransactionDto);
+  @ApiResponse({ status: 200, description: 'The transaction has been successfully updated.' })
+  @ApiResponse({ status: 404, description: 'Transaction not found.' })
+  @ApiBody({
+    type: UpdateTransactionDto,
+    description: 'Updated transaction data',
+    examples: {
+      example1: {
+        value: {
+          status: 'completed',
+          transactionMessage: 'Transaction successful'
+        }
+      }
+    }
+  })
+  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
+    return this.transactionService.update(id, updateTransactionDto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @Delete(':id')
   @ApiOperation({ summary: 'Delete a transaction' })
-  @ApiResponse({ status: 200, description: 'Transaction deleted successfully' })
-  @Delete(':transactionId')
-  async delete(@Param('transactionId') transactionId: string) {
-    return this.transactionService.delete(transactionId);
+  @ApiResponse({ status: 200, description: 'The transaction has been successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Transaction not found.' })
+  remove(@Param('id') id: string) {
+    return this.transactionService.remove(id);
   }
 
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get all transactions for a user' })
+  @ApiResponse({ status: 200, description: 'Return all transactions for the user.' })
+  findByUserId(@Param('userId') userId: string) {
+    return this.transactionService.findByUserId(userId);
+  }
+
+  @Get('type/:type')
+  @ApiOperation({ summary: 'Get all transactions of a specific type' })
+  @ApiResponse({ status: 200, description: 'Return all transactions of the specified type.' })
+  findByType(@Param('type') type: string) {
+    return this.transactionService.findByType(type);
+  }
+
+  @Get('status/:status')
+  @ApiOperation({ summary: 'Get all transactions with a specific status' })
+  @ApiResponse({ status: 200, description: 'Return all transactions with the specified status.' })
+  findByStatus(@Param('status') status: string) {
+    return this.transactionService.findByStatus(status);
+  }
+
+  @Get('stats/:userId')
+  @ApiOperation({ summary: 'Get transaction statistics for a user' })
+  @ApiResponse({ status: 200, description: 'Return transaction statistics for the user.' })
+  getTransactionStats(@Param('userId') userId: string) {
+    return this.transactionService.getTransactionStats(userId);
+  }
 }

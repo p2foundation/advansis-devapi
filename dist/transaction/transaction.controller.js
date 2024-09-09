@@ -23,81 +23,154 @@ let TransactionController = class TransactionController {
     constructor(transactionService) {
         this.transactionService = transactionService;
     }
-    async create(createTransactionDto) {
+    create(createTransactionDto) {
         return this.transactionService.create(createTransactionDto);
     }
-    async findAll() {
+    findAll() {
         return this.transactionService.findAll();
     }
-    async findOne(transactionId) {
-        return this.transactionService.findOne(transactionId);
+    findOne(id) {
+        return this.transactionService.findOne(id);
     }
-    async update(transactionId, updateTransactionDto) {
-        return this.transactionService.update(transactionId, updateTransactionDto);
+    update(id, updateTransactionDto) {
+        return this.transactionService.update(id, updateTransactionDto);
     }
-    async delete(transactionId) {
-        return this.transactionService.delete(transactionId);
+    remove(id) {
+        return this.transactionService.remove(id);
+    }
+    findByUserId(userId) {
+        return this.transactionService.findByUserId(userId);
+    }
+    findByType(type) {
+        return this.transactionService.findByType(type);
+    }
+    findByStatus(status) {
+        return this.transactionService.findByStatus(status);
+    }
+    getTransactionStats(userId) {
+        return this.transactionService.getTransactionStats(userId);
     }
 };
 exports.TransactionController = TransactionController;
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Create a new transaction' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Transaction created successfully', type: create_transaction_dto_1.CreateTransactionDto }),
     (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new transaction' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'The transaction has been successfully created.' }),
+    (0, swagger_1.ApiBody)({
+        type: create_transaction_dto_1.CreateTransactionDto,
+        description: 'Transaction data',
+        examples: {
+            example1: {
+                value: {
+                    userId: '123456',
+                    transactionType: 'airtime',
+                    amount: 10,
+                    currency: 'GHS',
+                    status: 'pending',
+                    transactionId: 'TRX123456',
+                    operator: 'MTN',
+                    recipientPhone: '233241234567'
+                }
+            }
+        }
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_transaction_dto_1.CreateTransactionDto]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], TransactionController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Find all transactions' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'List of transactions', isArray: true, type: [create_transaction_dto_1.CreateTransactionDto] }),
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all transactions' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Return all transactions.' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], TransactionController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Find a transaction by ID' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Transaction found', type: create_transaction_dto_1.CreateTransactionDto }),
-    (0, common_1.Get)(':transactionId'),
-    __param(0, (0, common_1.Param)('transactionId')),
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a transaction by id' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Return the transaction.' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Transaction not found.' }),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], TransactionController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Put)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Update a transaction' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Transaction updated successfully', type: update_transaction_dto_1.UpdateTransactionDto }),
-    (0, common_1.Put)(':transactionId'),
-    __param(0, (0, common_1.Param)('transactionId')),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'The transaction has been successfully updated.' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Transaction not found.' }),
+    (0, swagger_1.ApiBody)({
+        type: update_transaction_dto_1.UpdateTransactionDto,
+        description: 'Updated transaction data',
+        examples: {
+            example1: {
+                value: {
+                    status: 'completed',
+                    transactionMessage: 'Transaction successful'
+                }
+            }
+        }
+    }),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_transaction_dto_1.UpdateTransactionDto]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], TransactionController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a transaction' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Transaction deleted successfully' }),
-    (0, common_1.Delete)(':transactionId'),
-    __param(0, (0, common_1.Param)('transactionId')),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'The transaction has been successfully deleted.' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Transaction not found.' }),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], TransactionController.prototype, "delete", null);
+    __metadata("design:returntype", void 0)
+], TransactionController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('user/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all transactions for a user' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Return all transactions for the user.' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], TransactionController.prototype, "findByUserId", null);
+__decorate([
+    (0, common_1.Get)('type/:type'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all transactions of a specific type' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Return all transactions of the specified type.' }),
+    __param(0, (0, common_1.Param)('type')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], TransactionController.prototype, "findByType", null);
+__decorate([
+    (0, common_1.Get)('status/:status'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all transactions with a specific status' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Return all transactions with the specified status.' }),
+    __param(0, (0, common_1.Param)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], TransactionController.prototype, "findByStatus", null);
+__decorate([
+    (0, common_1.Get)('stats/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get transaction statistics for a user' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Return transaction statistics for the user.' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], TransactionController.prototype, "getTransactionStats", null);
 exports.TransactionController = TransactionController = __decorate([
-    (0, swagger_1.ApiTags)('transactions'),
-    (0, common_1.Controller)('api/v1/transactions'),
+    (0, swagger_1.ApiTags)('Transactions'),
+    (0, common_1.Controller)('transactions'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     __metadata("design:paramtypes", [transaction_service_1.TransactionService])
 ], TransactionController);
 //# sourceMappingURL=transaction.controller.js.map

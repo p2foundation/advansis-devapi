@@ -11,7 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MerchantSchema = exports.Merchant = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-let Merchant = class Merchant {
+const mongoose_2 = require("mongoose");
+let Merchant = class Merchant extends mongoose_2.Document {
 };
 exports.Merchant = Merchant;
 __decorate([
@@ -47,6 +48,10 @@ __decorate([
     __metadata("design:type", Number)
 ], Merchant.prototype, "rewardPoints", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ default: ['merchant'] }),
+    __metadata("design:type", Array)
+], Merchant.prototype, "roles", void 0);
+__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], Merchant.prototype, "address", void 0);
@@ -54,6 +59,30 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], Merchant.prototype, "lastLogin", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Merchant.prototype, "qrCodeUsageCount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Date)
+], Merchant.prototype, "lastQRCodeUsage", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: '' }),
+    __metadata("design:type", String)
+], Merchant.prototype, "invitationLink", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Merchant.prototype, "invitationLinkUsageCount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Date)
+], Merchant.prototype, "lastInvitationLinkUsage", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, required: false }),
+    __metadata("design:type", String)
+], Merchant.prototype, "taxId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: Date.now() }),
     __metadata("design:type", Date)

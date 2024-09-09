@@ -3,17 +3,18 @@ export const MONGODB_URI = 'mongodb+srv://advansistechnology:Y1VPrv9zPPi1ZyJR@cl
 export const JWT_SECRET = 'aflKxwRJSMeK9F2QT4fwpMeJf36POk6yJV_adQssw5c';
 export const JWT_EXPIRE = 3600;
 export const MOMO_CHARGES = 0.002;
-export const DISCOUNT = 0.0;
+export const FEE_CHARGES = 0.00;
+export const DISCOUNT = 0.00;
 export const DOMAIN_URL = 'https://advansistechnologies.com';
 // Twilio SMS services
 export const TWILIO_ACCOUNT_SID = 'AC';
 export const TWILIO_TOKEN = '';
 // Nodemailer
-export const GMAIL_MAIL_SERVICE = 'gmail';
+export const GMAIL_MAIL_SERVICE = 'smtp.gmail.com';
 export const GMAIL_MAIL_PORT = 587;
 export const EMAIL_ADDRESS = 'advansis.technology@gmail.com';
-export const EMAIL_PASSWORD = 'pZW@237JPS';
-export const RESPONSE_URL='http://lidapp.s3-website.us-east-2.amazonaws.com/receipt';
+export const EMAIL_PASSWORD = 'ehib wjtc ooay qwhs';
+export const RESPONSE_URL='advansistechnologies.com/receipt';
 // PRYMO AIRTIME, INTERNET, MOMO, SMS
 export const ONE4ALL_BASEURL='https://tppgh.myone4all.com/api';
 export const ONE4ALL_APIKEY='8d1fb360018011efa252356298658ba0';
@@ -38,5 +39,15 @@ export const RELOADLY_GRANT_TYPE_SANDBOX='client_credentials';
 export const RELOADLY_AUDIENCE_SANDBOX='https://topups-sandbox.reloadly.com';
 export const RELOADLY_BASEURL='https://auth.reloadly.com';
 export const RELOADLY_BASEURL_SANDBOX='https://topups-sandbox.reloadly.com';
-export const RELOADLY_TOKEN_SANDBOX= 'eyJraWQiOiI1N2JjZjNhNy01YmYwLTQ1M2QtODQ0Mi03ODhlMTA4OWI3MDIiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMzAyOSIsImlzcyI6Imh0dHBzOi8vcmVsb2FkbHktc2FuZGJveC5hdXRoMC5jb20vIiwiaHR0cHM6Ly9yZWxvYWRseS5jb20vc2FuZGJveCI6dHJ1ZSwiaHR0cHM6Ly9yZWxvYWRseS5jb20vcHJlcGFpZFVzZXJJZCI6IjIzMDI5IiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwiYXVkIjoiaHR0cHM6Ly90b3B1cHMtaHMyNTYtc2FuZGJveC5yZWxvYWRseS5jb20iLCJuYmYiOjE3MjU2MTc5NTYsImF6cCI6IjIzMDI5Iiwic2NvcGUiOiJzZW5kLXRvcHVwcyByZWFkLW9wZXJhdG9ycyByZWFkLXByb21vdGlvbnMgcmVhZC10b3B1cHMtaGlzdG9yeSByZWFkLXByZXBhaWQtYmFsYW5jZSByZWFkLXByZXBhaWQtY29tbWlzc2lvbnMiLCJleHAiOjE3MjU3MDQzNTYsImh0dHBzOi8vcmVsb2FkbHkuY29tL2p0aSI6IjZlM2Q5NmU4LTdjMzgtNDdlZi05NjAzLWExYWUwNGNlODRkMSIsImlhdCI6MTcyNTYxNzk1NiwianRpIjoiMDJjNTc2NDYtYmRkOS00MGNmLTg1YWUtYmVkYzg0NGJkODNhIn0.F-c7UrU6oDF52cccCiEVp8folx_0mUw8A1uPAHmul9E';
+export const RELOADLY_TOKEN_SANDBOX='eyJraWQiOiI1N2JjZjNhNy01YmYwLTQ1M2QtODQ0Mi03ODhlMTA4OWI3MDIiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMzAyOSIsImlzcyI6Imh0dHBzOi8vcmVsb2FkbHktc2FuZGJveC5hdXRoMC5jb20vIiwiaHR0cHM6Ly9yZWxvYWRseS5jb20vc2FuZGJveCI6dHJ1ZSwiaHR0cHM6Ly9yZWxvYWRseS5jb20vcHJlcGFpZFVzZXJJZCI6IjIzMDI5IiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwiYXVkIjoiaHR0cHM6Ly90b3B1cHMtaHMyNTYtc2FuZGJveC5yZWxvYWRseS5jb20iLCJuYmYiOjE3MjE5NDMxMjcsImF6cCI6IjIzMDI5Iiwic2NvcGUiOiJzZW5kLXRvcHVwcyByZWFkLW9wZXJhdG9ycyByZWFkLXByb21vdGlvbnMgcmVhZC10b3B1cHMtaGlzdG9yeSByZWFkLXByZXBhaWQtYmFsYW5jZSByZWFkLXByZXBhaWQtY29tbWlzc2lvbnMiLCJleHAiOjE3MjIwMjk1MjcsImh0dHBzOi8vcmVsb2FkbHkuY29tL2p0aSI6IjE4MDA2NDI3LWI2MWEtNGZiZi04YmM1LWIyYmM1MmMxZmM2OSIsImlhdCI6MTcyMTk0MzEyNywianRpIjoiNjMwNWQ4OTEtNTE2ZC00ZmJjLTphOTUtMTUyNGFlN2Q4NzFjIn0.U-5vOWJPxUQK8dKVjyLw50fLPn6f7LXGyE63HMAB5KY';
+// Amazon SES
+export const AWS_REGION='us-east-1';
+export const AWS_ACCESS_KEY_ID='';
+export const AWS_SECRET_ACCESS_KEY='';
+export const EMAIL_FROM='info@advansistechnologies.com';
+// Reward points
+export const QR_CODE_SCAN_REWARD_POINTS = 10; // Adjust the value as needed
+export const INVITATION_LINK_REWARD_POINTS = 5; // Adjust the value as needed
+export const MERCHANT_INVITATION_LINK_REWARD_POINTS = 10; // Adjust the value as needed
+
 

@@ -21,12 +21,20 @@ const create_merchant_dto_1 = require("./dto/create-merchant.dto");
 const update_merchant_dto_1 = require("./dto/update-merchant.dto");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const merchant_schema_1 = require("./schemas/merchant.schema");
+const change_password_dto_1 = require("./dto/change-password.dto");
+const reward_service_1 = require("../reward/reward.service");
+const merchant_invitation_link_dto_1 = require("./dto/merchant-invitation-link.dto");
+const merchant_auth_guard_1 = require("../auth/merchant-auth.guard");
+const roles_guard_1 = require("../auth/roles.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let MerchantController = MerchantController_1 = class MerchantController {
-    constructor(merchantService) {
+    constructor(merchantService, rewardsService) {
         this.merchantService = merchantService;
+        this.rewardsService = rewardsService;
         this.logger = new common_1.Logger(MerchantController_1.name);
     }
     async register(createMerchantDto) {
+        console.log(`createMerchantDto ==> ${JSON.stringify(createMerchantDto)}`);
         return this.merchantService.create(createMerchantDto);
     }
     async findMerchant(merchantId) {
@@ -38,12 +46,64 @@ let MerchantController = MerchantController_1 = class MerchantController {
     async update(merchantId, updateMerchantDto) {
         return this.merchantService.update(merchantId, updateMerchantDto);
     }
-    async delete(merchantId) {
-        return this.merchantService.delete(merchantId);
+    async delete(req, merchantId) {
+        if (req.user.roles.includes('admin') || req.user.merchantId === merchantId) {
+            try {
+                await this.merchantService.delete(merchantId);
+                return { message: 'Merchant has been successfully removed' };
+            }
+            catch (error) {
+                if (error instanceof common_1.NotFoundException) {
+                    throw new common_1.NotFoundException(error.message);
+                }
+                throw error;
+            }
+        }
+        else {
+            throw new common_1.UnauthorizedException('You do not have permission to delete this merchant');
+        }
     }
     async getQRCode(clientId) {
         const merchant = await this.merchantService.findOneByClientId(clientId);
         return { qrCode: merchant.qrCode };
+    }
+    async changePassword(clientId, changePasswordDto) {
+        try {
+            await this.merchantService.changePassword(clientId, changePasswordDto.currentPassword, changePasswordDto.newPassword);
+            return { message: 'Password changed successfully' };
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw new common_1.NotFoundException(error.message);
+            }
+            else if (error instanceof common_1.BadRequestException) {
+                throw new common_1.BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
+    async trackQRCodeUsage(clientId) {
+        return this.merchantService.trackQRCodeUsage(clientId);
+    }
+    async getQRCodeUsageStats(clientId) {
+        return this.merchantService.getQRCodeUsageStats(clientId);
+    }
+    async scanQRCode(clientId) {
+        await this.merchantService.trackQRCodeUsage(clientId);
+        await this.rewardsService.awardQRCodeScanPoints(clientId, 'merchant');
+        return { message: 'QR code scanned and points awarded' };
+    }
+    async generateInvitationLink(req) {
+        const merchantId = req.user.merchantId;
+        const invitationLink = await this.merchantService.generateInvitationLink(merchantId);
+        return { invitationLink };
+    }
+    async trackInvitationLinkUsage(invitationLink) {
+        return this.merchantService.trackInvitationLinkUsage(invitationLink);
+    }
+    async getInvitationLinkStats(req) {
+        const clientId = req.user.merchantId;
+        return this.merchantService.getInvitationLinkStats(clientId);
     }
 };
 exports.MerchantController = MerchantController;
@@ -60,43 +120,63 @@ __decorate([
                 name: {
                     type: 'string',
                     description: 'The name of the merchant',
+                    example: 'Accra Supermarket'
                 },
                 email: {
                     type: 'string',
                     description: 'Email address of the merchant',
+                    example: 'info@accrasupermarket.com'
                 },
                 phoneNumber: {
                     type: 'string',
                     description: 'Phone number of the merchant',
+                    example: '+233241234567'
                 },
                 password: {
                     type: 'string',
                     description: 'Password for the merchant account',
+                    example: 'securePassword123!'
                 },
                 street: {
                     type: 'string',
                     description: 'Street address of the merchant',
+                    example: '123 Independence Avenue'
                 },
                 city: {
                     type: 'string',
                     description: 'City of the merchant',
+                    example: 'Accra'
                 },
                 ghanaPostGPS: {
                     type: 'string',
                     description: 'Ghana Post GPS location of the merchant',
+                    example: 'GA-123-4567'
                 },
                 state: {
                     type: 'string',
-                    description: 'State of the merchant',
+                    description: 'State or region of the merchant',
+                    example: 'Greater Accra'
                 },
                 zip: {
                     type: 'string',
                     description: 'Zip code of the merchant',
+                    example: '00233'
                 },
                 country: {
                     type: 'string',
                     description: 'Country of the merchant',
+                    example: 'Ghana'
                 },
+                businessType: {
+                    type: 'string',
+                    description: 'Type of business',
+                    example: 'Retail'
+                },
+                taxId: {
+                    type: 'string',
+                    description: 'Tax identification number',
+                    example: 'GH1234567890'
+                }
             },
         },
     }),
@@ -119,7 +199,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Find all registered merchants' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'List of merchants', type: [merchant_schema_1.Merchant] }),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(merchant_auth_guard_1.MerchantAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -131,7 +211,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'The updated merchant', type: merchant_schema_1.Merchant }),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.Put)(':id'),
+    (0, common_1.Put)('update/:id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -141,12 +221,17 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete a merchant' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Merchant has been successfully removed' }),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], MerchantController.prototype, "delete", null);
 __decorate([
@@ -160,9 +245,99 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], MerchantController.prototype, "getQRCode", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Change merchant password' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Password changed successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad Request' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    (0, swagger_1.ApiBody)({
+        description: 'Password change details',
+        type: change_password_dto_1.ChangePasswordDto,
+    }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Put)(':clientId/change-password'),
+    __param(0, (0, common_1.Param)('clientId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, change_password_dto_1.ChangePasswordDto]),
+    __metadata("design:returntype", Promise)
+], MerchantController.prototype, "changePassword", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Track QR code usage for a merchant' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code usage tracked successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)(':clientId/track-qr-usage'),
+    __param(0, (0, common_1.Param)('clientId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MerchantController.prototype, "trackQRCodeUsage", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Get QR code usage stats for a merchant' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code usage stats retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Get)(':clientId/qr-usage-stats'),
+    __param(0, (0, common_1.Param)('clientId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MerchantController.prototype, "getQRCodeUsageStats", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Scan QR code' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code scanned and points awarded' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)(':clientId/scan-qr'),
+    __param(0, (0, common_1.Param)('clientId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MerchantController.prototype, "scanQRCode", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Generate invitation link' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Invitation link generated successfully', type: String }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, merchant_auth_guard_1.MerchantAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)('generate-invitation-link'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], MerchantController.prototype, "generateInvitationLink", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Track invitation link usage' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Invitation link usage tracked successfully', type: merchant_schema_1.Merchant }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Get)('track-invitation-link/:invitationLink'),
+    __param(0, (0, common_1.Param)('invitationLink')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MerchantController.prototype, "trackInvitationLinkUsage", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Get invitation link stats' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Invitation link stats retrieved successfully', type: merchant_invitation_link_dto_1.MerchantInvitationLinkDto }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, merchant_auth_guard_1.MerchantAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Get)('invitation-link-stats'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], MerchantController.prototype, "getInvitationLinkStats", null);
 exports.MerchantController = MerchantController = MerchantController_1 = __decorate([
-    (0, swagger_1.ApiTags)('merchants'),
+    (0, swagger_1.ApiTags)('Merchants'),
     (0, common_1.Controller)('api/v1/merchants'),
-    __metadata("design:paramtypes", [merchant_service_1.MerchantService])
+    __metadata("design:paramtypes", [merchant_service_1.MerchantService,
+        reward_service_1.RewardService])
 ], MerchantController);
 //# sourceMappingURL=merchant.controller.js.map

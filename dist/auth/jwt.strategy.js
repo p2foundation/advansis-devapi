@@ -15,23 +15,34 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
 const constants_1 = require("../constants");
+const config_1 = require("@nestjs/config");
+const user_service_1 = require("../user/user.service");
 let JwtStrategy = JwtStrategy_1 = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor() {
+    constructor(configService, userService) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || constants_1.JWT_SECRET
+            secretOrKey: configService.get('JWT_SECRET') || constants_1.JWT_SECRET,
         });
+        this.configService = configService;
+        this.userService = userService;
         this.logger = new common_1.Logger(JwtStrategy_1.name);
     }
     async validate(payload) {
-        this.logger.debug(`Validate payload ==> ${payload}`);
-        return { sub: payload.sub, username: payload.username, roles: payload.roles };
+        if (!payload.sub) {
+            throw new common_1.UnauthorizedException('Invalid token payload');
+        }
+        const user = await this.userService.findOneById(payload.sub);
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        return { userId: payload.sub, username: payload.username, roles: user.roles };
     }
 };
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = JwtStrategy_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService,
+        user_service_1.UserService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

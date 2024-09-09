@@ -24,7 +24,6 @@ const axios_1 = require("@nestjs/axios");
 const config_1 = require("@nestjs/config");
 const notification_module_1 = require("./notification/notification.module");
 const prymo_module_1 = require("./prymo/prymo.module");
-const configuration_1 = require("./configs/configuration");
 const airtime_module_1 = require("./one4all/airtime/airtime.module");
 const internet_module_1 = require("./one4all/internet/internet.module");
 const psmobilemoney_module_1 = require("./payswitch/psmobilemoney/psmobilemoney.module");
@@ -40,7 +39,7 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({
-                load: [configuration_1.default]
+                isGlobal: true,
             }),
             mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || constants_1.MONGODB_URI),
             auth_module_1.AuthModule,

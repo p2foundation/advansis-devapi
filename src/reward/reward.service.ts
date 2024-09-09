@@ -4,9 +4,12 @@ import { Model } from 'mongoose';
 import { Reward, RewardDocument } from './schemas/reward.schema';
 import { CreateRewardDto } from './dto/create-reward.dto';
 import { UpdateRewardDto } from './dto/update-reward.dto';
+import { QR_CODE_SCAN_REWARD_POINTS } from 'src/constants';
 
 @Injectable()
 export class RewardService {
+  userService: any;
+  merchantService: any;
   constructor(@InjectModel(Reward.name) private rewardModel: Model<RewardDocument>) {}
 
   async create(createRewardDto: CreateRewardDto): Promise<Reward> {
@@ -39,5 +42,13 @@ export class RewardService {
 
   async delete(userId: string): Promise<void> {
     await this.rewardModel.findOneAndDelete({ userId }).exec();
+  }
+
+  async awardQRCodeScanPoints(scannerId: string, scannerType: 'user' | 'merchant'): Promise<void> {
+    if (scannerType === 'user') {
+      await this.userService.addPoints(scannerId, QR_CODE_SCAN_REWARD_POINTS);
+    } else {
+      await this.merchantService.updateRewardPoints(scannerId, QR_CODE_SCAN_REWARD_POINTS);
+    }
   }
 }

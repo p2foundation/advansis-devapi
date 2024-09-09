@@ -8,26 +8,46 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var MerchantAuthGuard_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MerchantAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
-const core_1 = require("@nestjs/core");
-let MerchantAuthGuard = class MerchantAuthGuard {
-    constructor(reflector) {
-        this.reflector = reflector;
+const jwt_1 = require("@nestjs/jwt");
+const constants_1 = require("../constants");
+let MerchantAuthGuard = MerchantAuthGuard_1 = class MerchantAuthGuard {
+    constructor(jwtService) {
+        this.jwtService = jwtService;
+        this.logger = new common_1.Logger(MerchantAuthGuard_1.name);
     }
-    canActivate(context) {
+    async canActivate(context) {
         const request = context.switchToHttp().getRequest();
-        const merchant = request.user;
-        if (!merchant || merchant.role !== 'merchant') {
-            throw new common_1.UnauthorizedException('Access Denied: Only authorized merchants can access this service');
+        const token = this.extractTokenFromHeader(request);
+        this.logger.debug(`Extracted token: ${token}`);
+        if (!token) {
+            this.logger.error('No token found in request');
+            throw new common_1.UnauthorizedException('No token provided');
         }
-        return true;
+        try {
+            const payload = await this.jwtService.verifyAsync(token, {
+                secret: process.env.JWT_SECRET || constants_1.JWT_SECRET
+            });
+            request['user'] = payload;
+            this.logger.debug(`Full payload: ${JSON.stringify(payload)}`);
+            return true;
+        }
+        catch (error) {
+            this.logger.error(`Failed to verify token: ${error.message}`);
+            throw new common_1.UnauthorizedException('Invalid token');
+        }
+    }
+    extractTokenFromHeader(request) {
+        const [type, token] = request.headers.authorization?.split(' ') ?? [];
+        return type === 'Bearer' ? token : undefined;
     }
 };
 exports.MerchantAuthGuard = MerchantAuthGuard;
-exports.MerchantAuthGuard = MerchantAuthGuard = __decorate([
+exports.MerchantAuthGuard = MerchantAuthGuard = MerchantAuthGuard_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [core_1.Reflector])
+    __metadata("design:paramtypes", [jwt_1.JwtService])
 ], MerchantAuthGuard);
 //# sourceMappingURL=merchant-auth.guard.js.map

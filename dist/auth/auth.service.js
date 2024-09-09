@@ -18,6 +18,7 @@ const token_util_1 = require("../utilities/token.util");
 const jwt_1 = require("@nestjs/jwt");
 const constants_1 = require("../constants");
 const merchant_service_1 = require("../merchant/merchant.service");
+const common_2 = require("@nestjs/common");
 let AuthService = AuthService_1 = class AuthService {
     constructor(userService, jwtService, merchantService) {
         this.userService = userService;
@@ -36,6 +37,7 @@ let AuthService = AuthService_1 = class AuthService {
         return null;
     }
     async login(user) {
+        this.logger.verbose(`Login User ==> ${JSON.stringify(user)}`);
         try {
             const payload = {
                 username: user._doc.username,
@@ -77,7 +79,7 @@ let AuthService = AuthService_1 = class AuthService {
         }
         catch (error) {
             this.logger.error(`Error refreshing token: ${error.message}`);
-            throw new Error(`Failed to refresh token: ${error.message}`);
+            throw new common_2.UnauthorizedException(`Failed to refresh token: ${error.message}`);
         }
     }
     async validateMerchant(clientId, clientKey) {
@@ -88,11 +90,28 @@ let AuthService = AuthService_1 = class AuthService {
         }
         return null;
     }
+    async changePassword(userId, currentPassword, newPassword) {
+        this.logger.log(`Changing password for user: ${userId}`);
+        const user = await this.userService.findOneById(userId);
+        if (!user) {
+            this.logger.error(`User not found for ID: ${userId}`);
+            throw new common_2.NotFoundException('User not found');
+        }
+        const isPasswordValid = await password_util_1.PasswordUtil.comparePassword(currentPassword, user.password);
+        if (!isPasswordValid) {
+            this.logger.error(`Invalid current password for user: ${userId}`);
+            throw new common_2.UnauthorizedException('Current password is incorrect');
+        }
+        const hashedNewPassword = await password_util_1.PasswordUtil.hashPassword(newPassword);
+        await this.userService.updatePassword(userId, hashedNewPassword);
+        this.logger.log(`Password changed successfully for user: ${userId}`);
+        return true;
+    }
     async merchantLogin(merchant) {
         try {
             const payload = {
-                clientId: merchant.clientId,
-                sub: merchant._id,
+                name: merchant._doc.name,
+                sub: merchant._doc._id,
                 roles: ['merchant'],
             };
             const accessToken = this.jwtService.sign(payload, { secret: constants_1.JWT_SECRET });
